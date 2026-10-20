@@ -17,6 +17,12 @@
  button.alt{background:#777} button.bad{background:#b3261e} .row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
  .tag{font-size:.75rem;padding:.1rem .4rem;border-radius:10px;background:#e8ecf5} .sev-blocking{background:#f8d7d4}
  .muted{color:#777;font-size:.85rem} .err{color:#b3261e}
+ .tabs{display:flex;gap:0.5rem;border-bottom:1px solid #dde1e7;margin-bottom:1rem;margin-top:1rem;}
+ .tab-btn{background:none;border:none;padding:0.6rem 1.2rem;cursor:pointer;font-size:1rem;color:#777;border-bottom:3px solid transparent;border-radius:0;transition:all 0.2s;}
+ .tab-btn:hover{color:#222;background:#f0f2f5;}
+ .tab-btn.active{color:#2f5bd8;border-bottom:3px solid #2f5bd8;font-weight:bold;}
+ .tab-pane{display:none;}
+ .tab-pane.active{display:block;}
 </style>
 </head>
 <body>
@@ -28,5 +34,41 @@
  <span>{{ user.name }} ({{ user.role }})</span><a href="/logout">Kilépés</a>{% endif %}
 </header>
 <main>{% block content %}{% endblock %}</main>
+<script>
+ function openTab(event, tabId) {
+   // Hide all tab panes
+   const tabPanes = document.querySelectorAll('.tab-pane');
+   tabPanes.forEach(pane => pane.classList.remove('active'));
+
+   // Remove active class from all tab buttons
+   const tabBtns = document.querySelectorAll('.tab-btn');
+   tabBtns.forEach(btn => btn.classList.remove('active'));
+
+   // Show the selected tab pane and mark button as active
+   document.getElementById(tabId).classList.add('active');
+   if(event && event.currentTarget) {
+     event.currentTarget.classList.add('active');
+   }
+
+   // Optional: Save active tab to localStorage or URL hash
+   if(history.pushState) {
+       history.pushState(null, null, '#' + tabId);
+   }
+ }
+
+ // Initialize tabs based on URL hash or default to first tab
+ document.addEventListener("DOMContentLoaded", () => {
+    const hash = window.location.hash.substring(1);
+    const tabBtn = document.querySelector(`.tab-btn[data-target="${hash}"]`);
+    if(hash && tabBtn && document.getElementById(hash)) {
+        openTab({currentTarget: tabBtn}, hash);
+    } else {
+        const firstBtn = document.querySelector('.tab-btn');
+        if(firstBtn) {
+            openTab({currentTarget: firstBtn}, firstBtn.dataset.target);
+        }
+    }
+ });
+</script>
 </body>
 </html>
