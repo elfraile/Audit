@@ -70,6 +70,7 @@ def create_issue_from_result(
         issue_service.create_issue(
             db, run.campaign_id, description=desc,
             asset_ref=asset.name if asset else "",
-            source=f"Audit #{run.id}", category=res.category, user_id=user.id
+            source=f"Audit #{run.id}", category=res.category, user_id=user.id,
+            asset_id=run.asset_id, rule_id=res.rule_id
         )
     return back(f"/audits/{run_id}#results")

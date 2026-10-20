@@ -14,6 +14,7 @@ from app.modules.references import service as ref_service
 from app.modules.factsheet import queries as fact_queries
 from app.modules.factsheet import service as fact_service
 from app.modules.issues import queries as issue_queries
+from app.modules.issues.resolver import check_delivery_readiness
 from app.modules.rules import queries as rule_queries
 from app.modules.rules.models import APPROVED
 from app.modules.tenants import service as tenants
@@ -59,6 +60,7 @@ def campaign_page(campaign_id: int, request: Request, user: User = Depends(ui_us
         checklist=checklist_service.list_items(db, campaign_id),
         assets=assets_with_runs,
         references=refs,
+        delivery=check_delivery_readiness(db, campaign_id),
     )
 
 

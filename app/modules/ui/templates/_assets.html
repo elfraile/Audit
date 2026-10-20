@@ -55,6 +55,13 @@
     <button>Mappa beolvasása</button>
    </form>
   </div>
+  <div style="flex:1;min-width:280px">
+   <h4>Web link / Adobe XD beolvasása</h4>
+   <form method="post" action="/campaigns/{{ campaign.id }}/assets/url" class="row">
+    <input name="url" placeholder="https://xd.adobe.com/view/... vagy web URL" style="flex:1" required>
+    <button>Link beolvasása</button>
+   </form>
+  </div>
  </div>
  {% endif %}
 </section>

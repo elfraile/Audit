@@ -14,11 +14,13 @@ def _issue(db: Session, issue_id: int) -> Issue:
 
 
 def create_issue(db: Session, campaign_id: int, description: str, asset_ref: str = "", source: str = "",
-                 category: str = "unclassified", user_id: int | None = None) -> Issue:
+                 category: str = "unclassified", user_id: int | None = None,
+                 asset_id: int | None = None, rule_id: int | None = None) -> Issue:
     if not description.strip():
         raise ValueError("a leírás kötelező")
     issue = Issue(campaign_id=campaign_id, description=description.strip(), asset_ref=asset_ref,
-                  source=source, category=category, created_by=user_id)
+                  source=source, category=category, created_by=user_id,
+                  asset_id=asset_id, rule_id=rule_id)
     db.add(issue)
     db.commit()
     events.emit(events.CREATED, db, issue, user_id)
@@ -40,7 +42,7 @@ def set_status(db: Session, issue_id: int, status: str, user_id: int | None = No
 
 def edit_issue(db: Session, issue_id: int, **changes) -> Issue:
     issue = _issue(db, issue_id)
-    for field in ("description", "asset_ref", "source", "category"):
+    for field in ("description", "asset_ref", "source", "category", "asset_id", "rule_id"):
         if field in changes:
             setattr(issue, field, changes[field])
     db.commit()

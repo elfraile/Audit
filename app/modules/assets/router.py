@@ -18,6 +18,11 @@ class ScanIn(BaseModel):
     folder_path: str
 
 
+class UrlIn(BaseModel):
+    url: str
+    name: str = ""
+
+
 def _out(a) -> dict:
     return {
         "id": a.id, "campaign_id": a.campaign_id, "name": a.name,
@@ -54,6 +59,19 @@ def scan_folder(
         return [_out(a) for a in assets]
     except ValueError as e:
         raise HTTPException(400, str(e)) from e
+
+
+@router.post("/campaigns/{campaign_id}/assets/url")
+def ingest_url(
+    campaign_id: int, body: UrlIn,
+    user: User = Depends(require_editor), db: Session = Depends(get_db)
+):
+    ensure_campaign_access(db, user, campaign_id)
+    try:
+        asset = service.ingest_url(db, campaign_id, body.url, body.name)
+        return _out(asset)
+    except Exception as e:
+        raise HTTPException(400, f"Hiba a link beolvasásakor: {e}") from e
 
 
 @router.get("/assets/{asset_id}")

@@ -40,6 +40,21 @@ def scan_folder(
     return back(f"/campaigns/{campaign_id}#assets")
 
 
+@router.post("/campaigns/{campaign_id}/assets/url")
+def ingest_url(
+    campaign_id: int, url: str = Form(...), name: str = Form(""),
+    user: User = Depends(ui_user), db: Session = Depends(get_db)
+):
+    ensure_campaign_access(db, user, campaign_id)
+    if user.role not in EDIT_ROLES:
+        raise HTTPException(403)
+    try:
+        asset_service.ingest_url(db, campaign_id, url, name)
+    except Exception:
+        pass
+    return back(f"/campaigns/{campaign_id}#assets")
+
+
 @router.get("/assets/{asset_id}")
 def asset_detail(asset_id: int, user: User = Depends(ui_user), db: Session = Depends(get_db)):
     asset = asset_service.get_asset(db, asset_id)

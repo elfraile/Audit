@@ -51,7 +51,7 @@ def check_rule(
     norm_full = normalize_text(full_text).lower()
 
     # 1. Tiltott minta ellenőrzése
-    forbidden = check_spec.get("forbidden")
+    forbidden = check_spec.get("forbidden") or (check_spec.get("text") if check_spec.get("type") == "forbidden" else None)
     if forbidden:
         found = find_in_blocks(forbidden, blocks)
         if found or (normalize_text(forbidden).lower() in norm_full):
@@ -59,7 +59,7 @@ def check_rule(
         return PASSED, f"Tiltott elem nem található: '{forbidden}'", {}
 
     # 2. Kötelező minta ellenőrzése
-    must_contain = check_spec.get("must_contain")
+    must_contain = check_spec.get("must_contain") or (check_spec.get("text") if check_spec.get("type") == "must_contain" else None)
     if must_contain:
         found = find_in_blocks(must_contain, blocks)
         if not found and (normalize_text(must_contain).lower() not in norm_full):
@@ -83,7 +83,7 @@ def check_rule(
         return check_decision_rule(dec_question, expected, opts, asset_preview_path, full_text, min_p, decision_model)
 
     # 5. Regex vizsgálat
-    regex_pattern = check_spec.get("regex")
+    regex_pattern = check_spec.get("regex") or (check_spec.get("pattern") if check_spec.get("type") == "regex" else None)
     if regex_pattern:
         m = re.search(regex_pattern, full_text, re.IGNORECASE)
         if not m:

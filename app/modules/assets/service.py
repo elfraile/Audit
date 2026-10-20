@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from .extractor import extract_image, extract_pdf
 from .models import Asset, AssetContent
+from .web_connector import ingest_url
 
 SUPPORTED_EXTS = {".pdf": "pdf", ".png": "image", ".jpg": "image", ".jpeg": "image"}
 

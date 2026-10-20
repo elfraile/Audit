@@ -20,6 +20,8 @@ class Issue(Base):
     campaign_id: Mapped[int] = mapped_column(index=True)
     description: Mapped[str] = mapped_column(Text)
     asset_ref: Mapped[str] = mapped_column(String(255), default="")
+    asset_id: Mapped[int | None] = mapped_column(default=None, nullable=True, index=True)
+    rule_id: Mapped[int | None] = mapped_column(default=None, nullable=True, index=True)
     source: Mapped[str] = mapped_column(Text, default="")
     category: Mapped[str] = mapped_column(String(60), default="unclassified")
     status: Mapped[str] = mapped_column(String(20), default=OPEN, index=True)
