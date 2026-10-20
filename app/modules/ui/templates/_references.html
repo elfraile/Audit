@@ -1,47 +1,61 @@
-<section id="references">
- <h2>Vizuális referencia-tár (Márkaelemek & termékek)</h2>
- <p class="muted">A jóváhagyott hivatalos logók, termékfotók és csomagolások gyűjteménye a vizuális összehasonlításhoz.</p>
-
- <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));gap:1rem;margin-top:.8rem">
-  {% for r in references %}
-  <div class="card" style="text-align:center;padding:.8rem">
-   <div style="height:100px;display:flex;align-items:center;justify-content:center;background:#f9f9f9;border-radius:4px;overflow:hidden;margin-bottom:.5rem">
-    <img src="/api/references/{{ r.id }}/image" alt="{{ r.name }}" style="max-height:100%;max-width:100%;object-fit:contain">
-   </div>
-   <strong>{{ r.name }}</strong>
-   <div class="row" style="justify-content:center;margin-top:.4rem">
-    <span class="tag">{{ r.category }}</span>
-    <span class="tag">{{ r.scope_type }}</span>
-   </div>
-   {% if can_edit %}
-   <form method="post" action="/campaigns/{{ campaign.id }}/references/{{ r.id }}/delete" style="margin-top:.6rem">
-    <button class="bad" type="submit" style="padding:.2rem .5rem;font-size:.75rem">Törlés</button>
-   </form>
-   {% endif %}
+<div id="references" class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden w-full space-y-4">
+  <div class="p-4 bg-surface-container-low border-b border-outline-variant flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary text-headline-sm" data-icon="branding_watermark">branding_watermark</span>
+      <h2 class="font-headline-sm text-base text-on-surface font-semibold m-0">Vizuális referencia-tár</h2>
+    </div>
+    <span class="font-body-sm text-xs text-outline italic">Jóváhagyott hivatalos logók, fotók a vizuális összehasonlításhoz</span>
   </div>
-  {% else %}
-  <p class="muted" style="grid-column:1/-1">Még nincs feltöltött referencia-elem.</p>
-  {% endfor %}
- </div>
 
- {% if can_edit %}
- <div style="margin-top:1.2rem;background:#f4f5f8;padding:1rem;border-radius:6px">
-  <h4>Új referencia-elem feltöltése</h4>
-  <form method="post" action="/campaigns/{{ campaign.id }}/references" enctype="multipart/form-data" class="row">
-   <input name="name" placeholder="Referencia megnevezése" required style="flex:1;min-width:180px">
-   <select name="category">
-    <option value="logo">Logó / Márkajelzés</option>
-    <option value="product">Termék / Csomagolás</option>
-    <option value="pack">Ajándékcsomag / Fődíj</option>
-    <option value="other">Egyéb elem</option>
-   </select>
-   <select name="scope_type">
-    <option value="campaign">Csak erre a kampányra</option>
-    <option value="{{ client.id }}">Az ügyfél minden kampányára</option>
-   </select>
-   <input type="file" name="file" accept="image/*" required>
-   <button>Feltöltés</button>
-  </form>
- </div>
- {% endif %}
-</section>
+  <div class="p-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      {% for r in references %}
+      <div class="bg-surface-container-low rounded-lg border border-outline-variant p-3 flex flex-col items-center justify-between text-center relative group">
+        <div class="w-full h-24 bg-surface-container-lowest rounded-md border border-outline-variant/50 flex items-center justify-center overflow-hidden mb-3 p-1">
+          <img src="/api/references/{{ r.id }}/image" alt="{{ r.name }}" class="max-w-full max-h-full object-contain">
+        </div>
+        <strong class="font-body-sm text-sm text-on-surface font-medium truncate w-full" title="{{ r.name }}">{{ r.name }}</strong>
+        <div class="flex flex-wrap items-center justify-center gap-1 mt-2">
+          <span class="px-1.5 py-0.5 rounded bg-surface-container text-outline font-label-sm text-[9px] uppercase font-bold tracking-wider border border-outline-variant/30">{{ r.category }}</span>
+          <span class="px-1.5 py-0.5 rounded bg-primary-fixed/50 text-primary font-label-sm text-[9px] uppercase font-bold tracking-wider border border-primary/20">{{ r.scope_type }}</span>
+        </div>
+        {% if can_edit %}
+        <form method="post" action="/campaigns/{{ campaign.id }}/references/{{ r.id }}/delete" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button type="submit" class="w-6 h-6 bg-error-container text-error rounded-full flex items-center justify-center hover:bg-error hover:text-white transition-colors shadow-sm" title="Törlés">
+            <span class="material-symbols-outlined text-[14px]">close</span>
+          </button>
+        </form>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="col-span-full py-8 text-center text-outline">
+        <span class="material-symbols-outlined text-4xl mb-2 opacity-50">image_not_supported</span>
+        <p class="font-body-sm text-sm">Még nincs feltöltött referencia-elem.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if can_edit %}
+  <div class="p-4 bg-surface-container-low border-t border-outline-variant mt-2">
+    <h4 class="font-headline-sm text-sm text-on-surface font-semibold mb-3 flex items-center gap-1">
+      <span class="material-symbols-outlined text-[18px]">add_photo_alternate</span> Új referencia-elem feltöltése
+    </h4>
+    <form method="post" action="/campaigns/{{ campaign.id }}/references" enctype="multipart/form-data" class="flex flex-col sm:flex-row flex-wrap items-center gap-3">
+      <input class="flex-1 min-w-[200px] px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary w-full" name="name" placeholder="Referencia megnevezése" required>
+      <select class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary w-full sm:w-auto" name="category">
+        <option value="logo">Logó / Márkajelzés</option>
+        <option value="product">Termék / Csomagolás</option>
+        <option value="pack">Ajándékcsomag / Fődíj</option>
+        <option value="other">Egyéb elem</option>
+      </select>
+      <select class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary w-full sm:w-auto" name="scope_type">
+        <option value="campaign">Csak erre a kampányra</option>
+        <option value="{{ client.id }}">Az ügyfél minden kampányára</option>
+      </select>
+      <input type="file" name="file" accept="image/*" class="text-xs text-outline file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-surface-container file:text-primary hover:file:bg-surface-container-high w-full sm:w-auto" required>
+      <button class="w-full sm:w-auto px-4 py-1.5 rounded-lg bg-primary text-on-primary font-label-md hover:bg-primary-container transition-colors shadow-sm text-xs">Feltöltés</button>
+    </form>
+  </div>
+  {% endif %}
+</div>

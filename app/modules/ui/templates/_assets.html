@@ -1,72 +1,104 @@
-<section id="assets">
- <h2>Kreatív anyagok (Assetek) & Audit</h2>
- <table>
-  <tr><th>Fájlnév</th><th>Típus</th><th>Legutóbbi audit</th><th>Művelet</th></tr>
-  {% for a, run in assets %}
-  <tr>
-   <td>
-    <strong>{{ a.name }}</strong>
-    <div class="muted">{{ a.page_count }} oldal · {{ (a.file_size / 1024)|round(1) }} KB</div>
-   </td>
-   <td>
-    <span class="tag">{{ a.file_type }}</span>
-    {% if a.channel_id and channel_by_id.get(a.channel_id) %}
-    <span class="tag" style="background:#e0e7ff;color:#1e3a8a">{{ channel_by_id[a.channel_id].name }}</span>
-    {% endif %}
-   </td>
-   <td>
-    {% if run %}
-     <span class="tag sev-{{ 'blocking' if run.status == 'failed' else ('warning' if run.status == 'warning' else 'passed') }}">
-      {{ run.status }}
-     </span>
-     <div class="muted">
-      {{ run.passed_count }} sikeres / {{ run.failed_count }} hiba / {{ run.warning_count }} figyelmeztetés
-     </div>
-    {% else %}
-     <span class="muted">Még nem futott</span>
-    {% endif %}
-   </td>
-   <td>
-    <div class="row">
-     {% if can_edit %}
-     <form method="post" action="/campaigns/{{ campaign.id }}/assets/{{ a.id }}/audit" style="display:inline">
-      <button>{{ "Újra-audit" if run else "Audit indítása" }}</button>
-     </form>
-     {% endif %}
-     {% if run %}
-     <a href="/audits/{{ run.id }}"><button class="alt" type="button">Riport megtekintése</button></a>
-     {% endif %}
-    </div>
-   </td>
-  </tr>
-  {% else %}
-  <tr><td colspan="4" class="muted">Még nincs feltöltött vagy beolvasott kreatív anyag.</td></tr>
-  {% endfor %}
- </table>
+<div id="assets" class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden w-full space-y-4">
+  <div class="p-4 bg-surface-container-low border-b border-outline-variant flex items-center gap-2">
+    <span class="material-symbols-outlined text-primary text-headline-sm" data-icon="photo_library">photo_library</span>
+    <h2 class="font-headline-sm text-base text-on-surface font-semibold m-0">Kreatív anyagok (Assetek) & Audit</h2>
+  </div>
 
- {% if can_edit %}
- <div style="margin-top:1rem;display:flex;gap:1.5rem;flex-wrap:wrap">
-  <div style="flex:1;min-width:280px">
-   <h4>Fájl feltöltése</h4>
-   <form method="post" action="/campaigns/{{ campaign.id }}/assets/upload" enctype="multipart/form-data" class="row">
-    <input type="file" name="file" required>
-    <button>Feltöltés és elemzés</button>
-   </form>
+  <div class="overflow-x-auto w-full px-4">
+    <table class="w-full text-left border-collapse table-auto">
+      <thead>
+        <tr class="border-b border-outline-variant text-on-surface font-label-sm text-label-sm uppercase tracking-wider">
+          <th class="py-3 px-2 font-bold">Fájlnév</th>
+          <th class="py-3 px-2 font-bold">Típus</th>
+          <th class="py-3 px-2 font-bold">Legutóbbi audit</th>
+          <th class="py-3 px-2 font-bold text-right">Művelet</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-outline-variant/50 font-body-sm text-body-sm">
+      {% for a, run in assets %}
+        <tr class="hover:bg-surface-container-low/60 transition-colors">
+          <td class="py-3 px-2">
+            <strong class="font-medium text-on-surface block">{{ a.name }}</strong>
+            <div class="text-[11px] text-outline mt-0.5">{{ a.page_count }} oldal · {{ (a.file_size / 1024)|round(1) }} KB</div>
+          </td>
+          <td class="py-3 px-2">
+            <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono text-[10px] uppercase font-bold tracking-wider inline-block">{{ a.file_type }}</span>
+            {% if a.channel_id and channel_by_id.get(a.channel_id) %}
+            <span class="px-2 py-0.5 rounded bg-primary-fixed text-primary font-mono text-[10px] uppercase font-bold tracking-wider inline-block ml-1">{{ channel_by_id[a.channel_id].name }}</span>
+            {% endif %}
+          </td>
+          <td class="py-3 px-2">
+            {% if run %}
+              {% if run.status == 'failed' %}
+                <span class="px-2 py-0.5 rounded bg-error-container text-error text-[10px] font-bold border border-error/20 inline-block uppercase">ELBUKOTT</span>
+              {% elif run.status == 'warning' %}
+                <span class="px-2 py-0.5 rounded bg-tertiary-fixed text-tertiary text-[10px] font-bold border border-tertiary/20 inline-block uppercase">FIGYELMEZTETÉS</span>
+              {% else %}
+                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200 inline-block uppercase">MEGFELELT</span>
+              {% endif %}
+              <div class="text-[11px] text-outline mt-1 font-medium">
+                {{ run.passed_count }} sikeres / {{ run.failed_count }} hiba / {{ run.warning_count }} figy.
+              </div>
+            {% else %}
+              <span class="text-[11px] text-outline italic">Még nem futott</span>
+            {% endif %}
+          </td>
+          <td class="py-3 px-2 text-right">
+            <div class="flex items-center justify-end gap-2">
+              {% if can_edit %}
+              <form method="post" action="/campaigns/{{ campaign.id }}/assets/{{ a.id }}/audit" class="inline">
+                <button class="px-3 py-1.5 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 text-xs font-semibold transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px]">refresh</span> {{ "Újra-audit" if run else "Audit indítása" }}
+                </button>
+              </form>
+              {% endif %}
+              {% if run %}
+              <a href="/audits/{{ run.id }}" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-colors border border-outline-variant flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">visibility</span> Riport
+              </a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4" class="py-4 px-2 text-center text-outline">Még nincs feltöltött vagy beolvasott kreatív anyag.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
   </div>
-  <div style="flex:1;min-width:280px">
-   <h4>Lokális mappa beolvasása</h4>
-   <form method="post" action="/campaigns/{{ campaign.id }}/assets/scan" class="row">
-    <input name="folder_path" placeholder="Pl. W:\AI\Projects\Audit\..." style="flex:1" required>
-    <button>Mappa beolvasása</button>
-   </form>
+
+  {% if can_edit %}
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border-t border-outline-variant bg-surface-container-low/50">
+    <!-- Fájl feltöltés -->
+    <div class="bg-surface-container-lowest p-3 rounded-lg border border-outline-variant shadow-sm space-y-2">
+      <h4 class="font-headline-sm text-xs font-bold text-on-surface flex items-center gap-1">
+        <span class="material-symbols-outlined text-[16px] text-primary">upload_file</span> Fájl feltöltése
+      </h4>
+      <form method="post" action="/campaigns/{{ campaign.id }}/assets/upload" enctype="multipart/form-data" class="flex flex-col gap-2">
+        <input type="file" name="file" class="text-xs text-outline file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-surface-container file:text-primary hover:file:bg-surface-container-high w-full" required>
+        <button class="px-3 py-1.5 rounded bg-primary text-on-primary text-xs font-semibold hover:bg-primary-container transition-colors w-full text-center">Feltöltés és elemzés</button>
+      </form>
+    </div>
+    <!-- Lokális mappa -->
+    <div class="bg-surface-container-lowest p-3 rounded-lg border border-outline-variant shadow-sm space-y-2">
+      <h4 class="font-headline-sm text-xs font-bold text-on-surface flex items-center gap-1">
+        <span class="material-symbols-outlined text-[16px] text-primary">folder_open</span> Lokális mappa beolvasása
+      </h4>
+      <form method="post" action="/campaigns/{{ campaign.id }}/assets/scan" class="flex flex-col gap-2">
+        <input name="folder_path" placeholder="Pl. W:\AI\Projects\..." class="px-2 py-1 border border-outline-variant rounded font-body-sm text-xs focus:ring-1 focus:ring-primary w-full" required>
+        <button class="px-3 py-1.5 rounded bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-colors border border-outline-variant w-full text-center">Mappa beolvasása</button>
+      </form>
+    </div>
+    <!-- Web link / Adobe XD -->
+    <div class="bg-surface-container-lowest p-3 rounded-lg border border-outline-variant shadow-sm space-y-2">
+      <h4 class="font-headline-sm text-xs font-bold text-on-surface flex items-center gap-1">
+        <span class="material-symbols-outlined text-[16px] text-primary">link</span> Web link / Adobe XD beolvasása
+      </h4>
+      <form method="post" action="/campaigns/{{ campaign.id }}/assets/url" class="flex flex-col gap-2">
+        <input name="url" placeholder="https://xd.adobe.com/view/..." class="px-2 py-1 border border-outline-variant rounded font-body-sm text-xs focus:ring-1 focus:ring-primary w-full" required>
+        <button class="px-3 py-1.5 rounded bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-colors border border-outline-variant w-full text-center">Link beolvasása</button>
+      </form>
+    </div>
   </div>
-  <div style="flex:1;min-width:280px">
-   <h4>Web link / Adobe XD beolvasása</h4>
-   <form method="post" action="/campaigns/{{ campaign.id }}/assets/url" class="row">
-    <input name="url" placeholder="https://xd.adobe.com/view/... vagy web URL" style="flex:1" required>
-    <button>Link beolvasása</button>
-   </form>
-  </div>
- </div>
- {% endif %}
-</section>
+  {% endif %}
+</div>

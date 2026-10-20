@@ -1,34 +1,83 @@
-<section>
- <h2>Kampány-adatlap</h2>
- <table>
-  <tr><th>Adat</th><th>Érték</th><th>Forrás</th><th>Dátum</th></tr>
-  {% for f in facts %}
-  <tr><td>{{ f.key }}</td><td>{{ f.value }}</td><td>{{ f.source }}</td><td>{{ f.source_date or "" }}</td></tr>
-  {% else %}<tr><td colspan="4" class="muted">Még nincs rögzített adat.</td></tr>{% endfor %}
- </table>
- {% if questions %}
- <h3>Nyitott kérdések</h3>
- <ul>{% for q in questions %}<li>{{ q.key }} <span class="muted">{{ q.source }}</span></li>{% endfor %}</ul>
- {% endif %}
- {% if proposals %}
- <h3>Megerősítésre váró módosítások</h3>
- <table>
- {% for p in proposals %}
-  <tr><td>{{ p.key }}</td><td>{{ p.value }}</td><td>{{ p.source }}</td>
-  <td>{% if can_edit %}
-   <form method="post" action="/campaigns/{{ campaign.id }}/facts/{{ p.id }}/accept" style="display:inline"><button>Elfogad</button></form>
-   <form method="post" action="/campaigns/{{ campaign.id }}/facts/{{ p.id }}/reject" style="display:inline"><button class="alt">Elvet</button></form>
-  {% endif %}</td></tr>
- {% endfor %}
- </table>
- {% endif %}
- {% if can_edit %}
- <form method="post" action="/campaigns/{{ campaign.id }}/facts" class="row" style="margin-top:.8rem">
-  <input name="key" placeholder="Adat neve" required>
-  <input name="value" placeholder="Érték (üresen: nyitott kérdés)">
-  <input name="source" placeholder="Forrás">
-  <input name="source_date" type="date">
-  <button>Rögzít</button>
- </form>
- {% endif %}
-</section>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden w-full">
+  <div class="p-4 bg-surface-container-low border-b border-outline-variant flex items-center gap-2">
+    <span class="material-symbols-outlined text-primary text-headline-sm" data-icon="fact_check">fact_check</span>
+    <h2 class="font-headline-sm text-base text-on-surface font-semibold m-0">Kampány Tényadatok</h2>
+  </div>
+
+  <div class="overflow-x-auto w-full">
+    <table class="w-full text-left border-collapse table-auto">
+      <thead>
+        <tr class="bg-surface border-b border-outline-variant text-on-surface font-label-sm text-label-sm uppercase tracking-wider">
+          <th class="py-3 px-5 font-bold">Adat</th>
+          <th class="py-3 px-5 font-bold">Érték</th>
+          <th class="py-3 px-5 font-bold">Forrás</th>
+          <th class="py-3 px-5 font-bold">Dátum</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-outline-variant/50 font-body-sm text-body-sm">
+      {% for f in facts %}
+        <tr class="hover:bg-surface-container-low/60 transition-colors">
+          <td class="py-3 px-5 font-semibold text-on-surface">{{ f.key }}</td>
+          <td class="py-3 px-5 text-on-surface">{{ f.value }}</td>
+          <td class="py-3 px-5 text-outline">{{ f.source }}</td>
+          <td class="py-3 px-5 text-outline">{{ f.source_date or "" }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4" class="py-4 px-5 text-center text-outline">Még nincs rögzített adat.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if questions %}
+  <div class="p-4 bg-error-container/20 border-t border-outline-variant">
+    <h3 class="font-headline-sm text-sm text-error font-semibold mb-2">Nyitott kérdések</h3>
+    <ul class="list-disc list-inside text-body-sm text-on-surface space-y-1">
+      {% for q in questions %}
+        <li>{{ q.key }} <span class="text-outline text-xs ml-1">({{ q.source }})</span></li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% if proposals %}
+  <div class="p-4 border-t border-outline-variant">
+    <h3 class="font-headline-sm text-sm text-tertiary font-semibold mb-2">Megerősítésre váró módosítások</h3>
+    <div class="overflow-x-auto w-full rounded-lg border border-outline-variant">
+      <table class="w-full text-left border-collapse table-auto">
+        <tbody class="divide-y divide-outline-variant/50 font-body-sm text-body-sm">
+        {% for p in proposals %}
+          <tr class="hover:bg-surface-container-low/60">
+            <td class="py-2 px-4 font-medium">{{ p.key }}</td>
+            <td class="py-2 px-4">{{ p.value }}</td>
+            <td class="py-2 px-4 text-outline">{{ p.source }}</td>
+            <td class="py-2 px-4 text-right">
+              {% if can_edit %}
+                <form method="post" action="/campaigns/{{ campaign.id }}/facts/{{ p.id }}/accept" class="inline">
+                  <button class="px-2 py-1 bg-primary text-on-primary rounded font-label-sm hover:bg-primary-container transition-colors">Elfogad</button>
+                </form>
+                <form method="post" action="/campaigns/{{ campaign.id }}/facts/{{ p.id }}/reject" class="inline ml-1">
+                  <button class="px-2 py-1 bg-surface-container text-on-surface rounded font-label-sm hover:bg-surface-container-high transition-colors">Elvet</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if can_edit %}
+  <div class="p-4 bg-surface-container-low border-t border-outline-variant">
+    <form method="post" action="/campaigns/{{ campaign.id }}/facts" class="flex flex-wrap items-center gap-2">
+      <input class="flex-1 min-w-[150px] px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs text-on-surface focus:ring-1 focus:ring-primary" name="key" placeholder="Adat neve" required>
+      <input class="flex-1 min-w-[150px] px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs text-on-surface focus:ring-1 focus:ring-primary" name="value" placeholder="Érték (üresen: nyitott kérdés)">
+      <input class="flex-1 min-w-[120px] px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs text-on-surface focus:ring-1 focus:ring-primary" name="source" placeholder="Forrás">
+      <input class="w-32 px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs text-on-surface focus:ring-1 focus:ring-primary" name="source_date" type="date">
+      <button class="px-3 py-1.5 rounded-lg bg-primary text-on-primary font-label-md hover:bg-primary-container transition-colors shadow-sm">Rögzít</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
