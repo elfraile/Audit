@@ -9,6 +9,14 @@
     <option value="campaign">Csak erre a kampányra</option>
     <option value="client">Az ügyfél minden kampányára</option>
    </select>
+   {% if channels %}
+   <select name="channel_id">
+    <option value="">(Minden csatornára)</option>
+    {% for ch in channels %}
+    <option value="{{ ch.id }}">Csak: {{ ch.name }}</option>
+    {% endfor %}
+   </select>
+   {% endif %}
    <input type="hidden" name="scope_id" value="{{ client.id }}">
    <input name="source" placeholder="Forrás (pl. levél tárgya, dátuma)">
    <button>Szabályok javaslása</button>

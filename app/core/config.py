@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     secret_key: str = "change-me"
     # Betöltendő modulok sorrendben. Új képesség = új modul felvétele ide, a mag érintetlen marad.
     modules: list[str] = [
-        "accounts", "tenants", "factsheet", "rules", "issues",
+        "accounts", "tenants", "channels", "factsheet", "rules", "issues",
         "notifications", "checklist", "references", "assets", "audits", "ui"
     ]
     extractor: str = "null"  # a szabály-kinyerő regisztrált kulcsa

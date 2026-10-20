@@ -8,7 +8,12 @@
     <strong>{{ a.name }}</strong>
     <div class="muted">{{ a.page_count }} oldal · {{ (a.file_size / 1024)|round(1) }} KB</div>
    </td>
-   <td><span class="tag">{{ a.file_type }}</span></td>
+   <td>
+    <span class="tag">{{ a.file_type }}</span>
+    {% if a.channel_id and channel_by_id.get(a.channel_id) %}
+    <span class="tag" style="background:#e0e7ff;color:#1e3a8a">{{ channel_by_id[a.channel_id].name }}</span>
+    {% endif %}
+   </td>
    <td>
     {% if run %}
      <span class="tag sev-{{ 'blocking' if run.status == 'failed' else ('warning' if run.status == 'warning' else 'passed') }}">

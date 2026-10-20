@@ -29,9 +29,9 @@ def run_audit(db: Session, campaign_id: int, asset_id: int, user_id: int | None 
 
     passed, failed, warning = 0, 0, 0
 
-    # 1. Szabályok ellenőrzése
+    # 1. Szabályok ellenőrzése (ügyfél + kampány + csatorna-specifikus)
     ref_lookup = lambda rid: db.get(Reference, rid)
-    for rule in active_rules(db, client_id, campaign_id):
+    for rule in active_rules(db, client_id, campaign_id, channel_id=asset.channel_id):
         verdict, msg, evidence = check_rule(
             rule.text, rule.check or {}, full_text, blocks,
             asset_preview_path=asset.preview_path or "", ref_resolver=ref_lookup
@@ -59,6 +59,26 @@ def run_audit(db: Session, campaign_id: int, asset_id: int, user_id: int | None 
             db.add(res)
             if verdict == PASSED: passed += 1
             elif verdict == FAILED: failed += 1
+            else: warning += 1
+
+    # 3. Várt promóciós anyag elvárt szövegének ellenőrzése
+    if asset.deliverable_id:
+        from app.modules.channels.models import Deliverable
+        deliv = db.get(Deliverable, asset.deliverable_id)
+        if deliv and deliv.expected_copy and deliv.expected_copy.strip():
+            c_verdict, c_msg, c_ev = check_rule(
+                f"Kért képi tartalom: '{deliv.expected_copy}'",
+                {"type": "must_contain", "text": deliv.expected_copy},
+                full_text, blocks
+            )
+            res = AuditResult(
+                audit_run_id=run.id, rule_id=None, check_type="deliverable",
+                title=f"Kért képi tartalom ({deliv.name})", category="copy", severity="blocking",
+                verdict=c_verdict, message=c_msg, evidence=c_ev
+            )
+            db.add(res)
+            if c_verdict == PASSED: passed += 1
+            elif c_verdict == FAILED: failed += 1
             else: warning += 1
 
     run.passed_count, run.failed_count, run.warning_count = passed, failed, warning

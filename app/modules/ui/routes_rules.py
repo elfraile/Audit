@@ -18,14 +18,15 @@ def _editor(user: User) -> None:
 
 @router.post("/campaigns/{campaign_id}/rules/suggest")
 def suggest_rules(campaign_id: int, request: Request, text: str = Form(...), scope_type: str = Form("campaign"),
-                  scope_id: int = Form(0), source: str = Form(""), user: User = Depends(ui_user),
-                  db: Session = Depends(get_db)):
+                  scope_id: int = Form(0), source: str = Form(""), channel_id: int | None = Form(None),
+                  user: User = Depends(ui_user), db: Session = Depends(get_db)):
     _editor(user)
     scope_id = scope_id if scope_type == "client" else campaign_id
     ensure_scope_access(db, user, scope_type, scope_id)
     ctx = request.app.state.ctx
     extractor = ctx.extractors.get(ctx.settings.extractor)(ctx.settings)
-    suggest.suggest_rules(db, extractor, ctx.categories.keys(), scope_type, scope_id, text, source, user.id)
+    applies = {"channel_id": channel_id} if channel_id else None
+    suggest.suggest_rules(db, extractor, ctx.categories.keys(), scope_type, scope_id, text, source, user.id, applies_to=applies)
     return back(f"/campaigns/{campaign_id}")
 
 

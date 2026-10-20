@@ -103,6 +103,11 @@ def check_delivery_readiness(db: Session, campaign_id: int) -> dict:
     checklist_items = checklist_service.list_items(db, campaign_id)
     pending_checklist = [i.label for i in checklist_items if not i.done]
 
+    # Várt promóciós anyagok vizsgálata (ha vannak definiálva a kampányban)
+    from app.modules.channels.models import Deliverable
+    deliverables = list(db.scalars(select(Deliverable).where(Deliverable.campaign_id == campaign_id)))
+    missing_deliverables = [d.name for d in deliverables if not d.asset_id]
+
     reasons: list[str] = []
     if total_assets == 0:
         reasons.append("Nincs még feltöltött kreatív anyag a kampányban.")
@@ -118,9 +123,12 @@ def check_delivery_readiness(db: Session, campaign_id: int) -> dict:
     if pending_checklist:
         reasons.append(f"{len(pending_checklist)} ellenőrzőlista tétel még nincs teljesítve.")
 
+    if missing_deliverables:
+        reasons.append(f"{len(missing_deliverables)} várt promóciós anyag még nem készült el ({', '.join(missing_deliverables[:3])}).")
+
     is_ready = (total_assets > 0 and audited_count == total_assets and
                 len(failed_asset_names) == 0 and open_count == 0 and
-                len(pending_checklist) == 0)
+                len(pending_checklist) == 0 and len(missing_deliverables) == 0)
 
     if is_ready:
         reasons.append("Minden kreatív anyag sikeresen auditálva, minden hibalista és ellenőrzőlista tétel teljesítve.")
@@ -132,6 +140,7 @@ def check_delivery_readiness(db: Session, campaign_id: int) -> dict:
         "failed_assets": len(failed_asset_names),
         "open_issues": open_count,
         "pending_checklist": len(pending_checklist),
+        "missing_deliverables": len(missing_deliverables),
         "reasons": reasons
     }
 

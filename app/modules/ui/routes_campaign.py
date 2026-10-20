@@ -9,6 +9,7 @@ from app.modules.accounts.models import User
 from app.modules.accounts.roles import EDIT_ROLES
 from app.modules.assets import service as asset_service
 from app.modules.audits import service as audit_service
+from app.modules.channels import service as channel_service
 from app.modules.checklist import service as checklist_service
 from app.modules.references import service as ref_service
 from app.modules.factsheet import queries as fact_queries
@@ -46,6 +47,16 @@ def campaign_page(campaign_id: int, request: Request, user: User = Depends(ui_us
     assets_raw = asset_service.list_assets(db, campaign_id)
     assets_with_runs = [(a, audit_service.latest_run_for_asset(db, a.id)) for a in assets_raw]
     refs = ref_service.list_references(db, "campaign", campaign_id) + ref_service.list_references(db, "client", client.id)
+    channels = channel_service.list_channels(db, campaign_id)
+    deliverables = channel_service.list_deliverables(db, campaign_id)
+    deliverables_by_channel = {}
+    for d in deliverables:
+        deliverables_by_channel.setdefault(d.channel_id, []).append(d)
+    asset_by_id = {a.id: a for a in assets_raw}
+    latest_run_by_asset = {a.id: run for a, run in assets_with_runs}
+
+    channel_by_id = {c.id: c for c in channels}
+
     return render(
         request, "campaign.html", user, campaign=campaign, client=client,
         facts=fact_queries.confirmed_facts(db, campaign_id),
@@ -60,6 +71,12 @@ def campaign_page(campaign_id: int, request: Request, user: User = Depends(ui_us
         checklist=checklist_service.list_items(db, campaign_id),
         assets=assets_with_runs,
         references=refs,
+        channels=channels,
+        channel_by_id=channel_by_id,
+        deliverables=deliverables,
+        deliverables_by_channel=deliverables_by_channel,
+        asset_by_id=asset_by_id,
+        latest_run_by_asset=latest_run_by_asset,
         delivery=check_delivery_readiness(db, campaign_id),
     )
 
@@ -87,6 +104,41 @@ def resolve_proposal(campaign_id: int, fact_id: int, action: str, user: User = D
     elif action == "reject":
         fact_service.reject_proposal(db, fact_id)
     return back(f"/campaigns/{campaign_id}")
+
+
+@router.post("/campaigns/{campaign_id}/channels")
+def create_channel(campaign_id: int, name: str = Form(...), code: str = Form("other"),
+                   description: str = Form(""), user: User = Depends(ui_user),
+                   db: Session = Depends(get_db)):
+    _campaign(db, user, campaign_id, edit=True)
+    try:
+        channel_service.create_channel(db, campaign_id, name, code, description)
+    except ValueError:
+        pass
+    return back(f"/campaigns/{campaign_id}#channels")
+
+
+@router.post("/campaigns/{campaign_id}/channels/{channel_id}/delete")
+def delete_channel(campaign_id: int, channel_id: int, user: User = Depends(ui_user),
+                   db: Session = Depends(get_db)):
+    _campaign(db, user, campaign_id, edit=True)
+    channel_service.delete_channel(db, channel_id)
+    return back(f"/campaigns/{campaign_id}#channels")
+
+
+@router.post("/campaigns/{campaign_id}/channels/{channel_id}/deliverables")
+def create_deliverable(campaign_id: int, channel_id: int, name: str = Form(...),
+                       specs: str = Form(""), expected_copy: str = Form(""),
+                       post_copy: str = Form(""), file_pattern: str = Form(""),
+                       user: User = Depends(ui_user), db: Session = Depends(get_db)):
+    _campaign(db, user, campaign_id, edit=True)
+    try:
+        channel_service.create_deliverable(
+            db, channel_id, campaign_id, name, specs, expected_copy, post_copy, file_pattern
+        )
+    except ValueError:
+        pass
+    return back(f"/campaigns/{campaign_id}#channels")
 
 
 __all__ = ["router", "APPROVED"]

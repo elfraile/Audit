@@ -20,6 +20,8 @@ class Asset(Base):
     file_type: Mapped[str] = mapped_column(String(20))  # pdf, image
     file_size: Mapped[int] = mapped_column(default=0)
     page_count: Mapped[int] = mapped_column(default=1)
+    channel_id: Mapped[int | None] = mapped_column(default=None, nullable=True, index=True)
+    deliverable_id: Mapped[int | None] = mapped_column(default=None, nullable=True, index=True)
     preview_path: Mapped[str] = mapped_column(String(500), default="")
     created_at: Mapped[datetime] = mapped_column(default=utcnow)
 

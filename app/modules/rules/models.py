@@ -10,7 +10,7 @@ from app.core.db import Base
 DRAFT, APPROVED, REJECTED, RETIRED = "draft", "approved", "rejected", "retired"
 STATUSES = (DRAFT, APPROVED, REJECTED, RETIRED)
 SEVERITIES = ("blocking", "warning", "advice")
-SCOPES = ("client", "campaign")
+SCOPES = ("client", "campaign", "channel")
 
 
 class Rule(Base):
