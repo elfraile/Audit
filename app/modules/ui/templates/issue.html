@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Hibalista-tétel{% endblock %}
+{% block content %}
+<p class="muted"><a href="/campaigns/{{ campaign.id }}#issues">← {{ campaign.name }}</a></p>
+<section>
+ <h2>Tétel #{{ issue.id }} <span class="tag">{{ issue.status }}</span></h2>
+ <form method="post" action="/issues/{{ issue.id }}/edit">
+  <textarea name="description" rows="3">{{ issue.description }}</textarea>
+  <div class="row" style="margin-top:.4rem">
+   <input name="asset_ref" value="{{ issue.asset_ref }}" placeholder="Hatókör">
+   <input name="source" value="{{ issue.source }}" placeholder="Forrás">
+   <select name="category">
+    {% for key, label in categories.items() %}<option value="{{ key }}" {{ "selected" if key == issue.category }}>{{ label }}</option>{% endfor %}
+   </select>
+   {% if can_edit %}<button class="alt">Mentés</button>{% endif %}
+  </div>
+ </form>
+ {% if can_edit %}
+ <div class="row" style="margin-top:.8rem">
+  {% for s, label in (("open", "Újranyit"), ("done", "Teljesítve"), ("rejected", "Elutasítva")) %}
+   {% if s != issue.status %}<form method="post" action="/issues/{{ issue.id }}/status"><input type="hidden" name="status" value="{{ s }}"><button class="alt">{{ label }}</button></form>{% endif %}
+  {% endfor %}
+  {% if not issue.promoted %}
+  <form method="post" action="/issues/{{ issue.id }}/promote" class="row">
+   <select name="scope_type"><option value="campaign">Szabály: kampányra</option><option value="client">Szabály: az ügyfélre</option></select>
+   <button>Szabályjavaslat készítése</button>
+  </form>
+  {% else %}<span class="muted">Szabályjavaslat már készült (a kampányoldalon hagyható jóvá).</span>{% endif %}
+ </div>
+ {% endif %}
+</section>
+<section>
+ <h3>Megjegyzések</h3>
+ {% for c in comments %}
+  <div class="card"><div class="muted">{{ names.get(c.user_id, "?") }} · {{ c.created_at.strftime("%Y-%m-%d %H:%M") }}</div>{{ c.body }}</div>
+ {% else %}<p class="muted">Még nincs megjegyzés.</p>{% endfor %}
+ {% if can_edit %}
+ <form method="post" action="/issues/{{ issue.id }}/comment">
+  <textarea name="body" rows="2" placeholder="Megjegyzés (@e-mail-előtag megemlít valakit)" required></textarea>
+  <button style="margin-top:.4rem">Küldés</button>
+ </form>
+ {% endif %}
+</section>
+{% endblock %}

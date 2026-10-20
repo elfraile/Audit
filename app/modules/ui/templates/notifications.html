@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Értesítések</h1>
+<section>
+ <form method="post" action="/notifications/read"><button class="alt">Mind olvasott</button></form>
+ <table>
+ {% for n in items %}
+  <tr><td>{{ "" if n.is_read else "●" }}</td>
+  <td>{% if n.link %}<a href="{{ n.link }}">{{ n.text }}</a>{% else %}{{ n.text }}{% endif %}
+  <div class="muted">{{ n.created_at.strftime("%Y-%m-%d %H:%M") }}</div></td></tr>
+ {% else %}<tr><td class="muted">Nincs értesítés.</td></tr>{% endfor %}
+ </table>
+</section>
+{% endblock %}

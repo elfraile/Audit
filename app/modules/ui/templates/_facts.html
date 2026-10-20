@@ -1,0 +1,34 @@
+<section>
+ <h2>Kampány-adatlap</h2>
+ <table>
+  <tr><th>Adat</th><th>Érték</th><th>Forrás</th><th>Dátum</th></tr>
+  {% for f in facts %}
+  <tr><td>{{ f.key }}</td><td>{{ f.value }}</td><td>{{ f.source }}</td><td>{{ f.source_date or "" }}</td></tr>
+  {% else %}<tr><td colspan="4" class="muted">Még nincs rögzített adat.</td></tr>{% endfor %}
+ </table>
+ {% if questions %}
+ <h3>Nyitott kérdések</h3>
+ <ul>{% for q in questions %}<li>{{ q.key }} <span class="muted">{{ q.source }}</span></li>{% endfor %}</ul>
+ {% endif %}
+ {% if proposals %}
+ <h3>Megerősítésre váró módosítások</h3>
+ <table>
+ {% for p in proposals %}
+  <tr><td>{{ p.key }}</td><td>{{ p.value }}</td><td>{{ p.source }}</td>
+  <td>{% if can_edit %}
+   <form method="post" action="/campaigns/{{ campaign.id }}/facts/{{ p.id }}/accept" style="display:inline"><button>Elfogad</button></form>
+   <form method="post" action="/campaigns/{{ campaign.id }}/facts/{{ p.id }}/reject" style="display:inline"><button class="alt">Elvet</button></form>
+  {% endif %}</td></tr>
+ {% endfor %}
+ </table>
+ {% endif %}
+ {% if can_edit %}
+ <form method="post" action="/campaigns/{{ campaign.id }}/facts" class="row" style="margin-top:.8rem">
+  <input name="key" placeholder="Adat neve" required>
+  <input name="value" placeholder="Érték (üresen: nyitott kérdés)">
+  <input name="source" placeholder="Forrás">
+  <input name="source_date" type="date">
+  <button>Rögzít</button>
+ </form>
+ {% endif %}
+</section>

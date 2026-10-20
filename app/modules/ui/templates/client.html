@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="muted"><a href="/">Ügyfelek</a></p>
+<h1>{{ client.name }}</h1>
+<section>
+ <h2>Kampányok hibalistája</h2>
+ <table>
+  <tr><th>Kampány</th><th>Nyitott</th><th>Teljesítve</th><th>Elutasítva</th></tr>
+  {% for c in campaigns %}
+  <tr><td><a href="/campaigns/{{ c.id }}">{{ c.name }}</a></td>
+   <td>{{ counts[c.id]["open"] }}</td><td>{{ counts[c.id]["done"] }}</td><td>{{ counts[c.id]["rejected"] }}</td></tr>
+  {% else %}<tr><td class="muted">Nincs kampány.</td></tr>{% endfor %}
+ </table>
+</section>
+<section>
+ <h2>Visszatérő hibatípusok</h2>
+ <table>
+ {% for category, n in recurring %}
+  <tr><td>{{ labels.get(category, category) }}</td><td>{{ n }}</td></tr>
+ {% else %}<tr><td class="muted">Még nincs adat.</td></tr>{% endfor %}
+ </table>
+</section>
+{% endblock %}

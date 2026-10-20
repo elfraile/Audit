@@ -1,0 +1,22 @@
+<div class="card">
+ <form method="post" action="/campaigns/{{ campaign.id }}/rules/{{ r.id }}/edit">
+  <textarea name="text" rows="2">{{ r.text }}</textarea>
+  {% if r.note %}<p class="muted">Kérdés: {{ r.note }}</p>{% endif %}
+  <div class="row" style="margin-top:.4rem">
+   <select name="category">
+    {% for key, label in categories.items() %}<option value="{{ key }}" {{ "selected" if key == r.category }}>{{ label }}</option>{% endfor %}
+   </select>
+   <select name="severity">
+    {% for s in ("blocking", "warning", "advice") %}<option {{ "selected" if s == r.severity }}>{{ s }}</option>{% endfor %}
+   </select>
+   <span class="tag">{{ r.scope_type }}</span>
+   {% if can_edit %}<button class="alt">Mentés</button>{% endif %}
+  </div>
+ </form>
+ {% if can_edit %}
+ <div class="row" style="margin-top:.4rem">
+  <form method="post" action="/campaigns/{{ campaign.id }}/rules/{{ r.id }}/approve"><button>Jóváhagy</button></form>
+  <form method="post" action="/campaigns/{{ campaign.id }}/rules/{{ r.id }}/reject"><button class="bad">Elvet</button></form>
+ </div>
+ {% endif %}
+</div>

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Audit Riport - {{ asset.name }}{% endblock %}
+{% block content %}
+<p class="muted">
+ <a href="/campaigns/{{ campaign.id }}">← Vissza a kampányhoz ({{ campaign.name }})</a>
+</p>
+
+<h1>Audit Riport: {{ asset.name }}</h1>
+
+<section style="display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap">
+ <div>
+  <span class="tag sev-{{ 'blocking' if run.status == 'failed' else ('warning' if run.status == 'warning' else 'passed') }}" style="font-size:1.1rem;padding:.3rem .8rem">
+   {{ "HIBÁK TALÁLHATÓK" if run.status == 'failed' else ("FIGYELMEZTETÉS" if run.status == 'warning' else "MEGFELELT") }}
+  </span>
+ </div>
+ <div>
+  <strong>{{ run.passed_count }}</strong> sikeres ellenőrzés ·
+  <strong class="err">{{ run.failed_count }} hiba</strong> ·
+  <strong style="color:#d97706">{{ run.warning_count }} figyelmeztetés</strong>
+ </div>
+ <div class="sp"></div>
+ <div class="muted">Futtatva: {{ run.created_at.strftime("%Y-%m-%d %H:%M") }}</div>
+ {% if can_edit %}
+ <form method="post" action="/campaigns/{{ campaign.id }}/assets/{{ asset.id }}/audit">
+  <button>Újra-auditálás</button>
+ </form>
+ {% endif %}
+</section>
+
+<div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start">
+ <!-- Bal oszlop: Vizuális előnézet & Szöveg -->
+ <div style="flex:1;min-width:320px;max-width:480px">
+  <section>
+   <h3>Vizuális előnézet</h3>
+   {% if asset.preview_path %}
+    <img src="/api/assets/{{ asset.id }}/preview" alt="Előnézet" style="width:100%;border-radius:4px;border:1px solid #ccc;display:block">
+   {% else %}
+    <p class="muted">Nincs elérhető képi előnézet ehhez az anyaghoz.</p>
+   {% endif %}
+  </section>
+
+  <details class="card">
+   <summary><strong>Kinyert normalizált szöveg megtekintése</strong></summary>
+   <pre style="white-space:pre-wrap;font-size:.85rem;margin-top:.6rem;max-height:300px;overflow-y:auto;background:#f9f9f9;padding:.6rem;border-radius:4px">{{ content.plain_text if content else "Nincs kinyert szöveg." }}</pre>
+  </details>
+ </div>
+
+ <!-- Jobb oszlop: Ellenőrzési eredmények -->
+ <div style="flex:2;min-width:340px" id="results">
+  <h2>Tételes ellenőrzések ({{ results|length }})</h2>
+
+  {% for res in results %}
+  <div class="card" style="border-left: 4px solid {{ '#b3261e' if res.verdict == 'failed' else ('#f2c14e' if res.verdict == 'warning' else '#2e7d32') }}">
+   <div class="row" style="margin-bottom:.4rem">
+    <span class="tag" style="background:{{ '#f8d7d4' if res.verdict == 'failed' else ('#fef3c7' if res.verdict == 'warning' else '#d1e7dd') }};color:{{ '#b3261e' if res.verdict == 'failed' else ('#92400e' if res.verdict == 'warning' else '#0f5132') }}">
+     {{ "HIBA" if res.verdict == 'failed' else ("FIGYELMEZTETÉS" if res.verdict == 'warning' else "MEGFELELT") }}
+    </span>
+    <span class="tag">{{ categories.get(res.category, res.category) }}</span>
+    <span class="muted">{{ "Kampány-tényadat" if res.check_type == 'factsheet' else "Szabály" }}</span>
+   </div>
+
+   <h4>{{ res.title }}</h4>
+   <p style="margin:.3rem 0">{{ res.message }}</p>
+
+   {% if res.evidence %}
+   <div style="background:#f4f5f8;padding:.4rem .6rem;border-radius:4px;font-size:.85rem;margin:.4rem 0">
+    {% if res.evidence.get("expected") %}
+     <div><strong>Elvárt:</strong> {{ res.evidence["expected"] }}</div>
+    {% endif %}
+    {% if res.evidence.get("matched_text") %}
+     <div><strong>Azonosított szöveg:</strong> {{ res.evidence["matched_text"] }}</div>
+    {% endif %}
+    {% if res.evidence.get("bbox") %}
+     <div class="muted">Pozíció (oldal {{ res.evidence.get("page", 0) }}): {{ res.evidence["bbox"] }}</div>
+    {% endif %}
+   </div>
+   {% endif %}
+
+   {% if res.verdict == 'failed' and can_edit %}
+   <form method="post" action="/audits/{{ run.id }}/results/{{ res.id }}/issue" style="margin-top:.4rem">
+    <button class="bad" type="submit">+ Hibalista tétel készítése ebből</button>
+   </form>
+   {% endif %}
+  </div>
+  {% else %}
+  <p class="muted">Nincsenek kiértékelhető szabályok vagy adatok ehhez a kampányhoz.</p>
+  {% endfor %}
+ </div>
+</div>
+{% endblock %}

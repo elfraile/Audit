@@ -1,0 +1,30 @@
+<section>
+ <h2>Szabályok</h2>
+ {% if can_edit %}
+ <form method="post" action="/campaigns/{{ campaign.id }}/rules/suggest">
+  <p class="muted">Illessz be ügyfél-levelet, briefet vagy szabályszöveget; a rendszer szabálykártyákat javasol.</p>
+  <textarea name="text" rows="5" required></textarea>
+  <div class="row" style="margin-top:.4rem">
+   <select name="scope_type">
+    <option value="campaign">Csak erre a kampányra</option>
+    <option value="client">Az ügyfél minden kampányára</option>
+   </select>
+   <input type="hidden" name="scope_id" value="{{ client.id }}">
+   <input name="source" placeholder="Forrás (pl. levél tárgya, dátuma)">
+   <button>Szabályok javaslása</button>
+  </div>
+ </form>
+ {% endif %}
+
+ {% if drafts %}<h3>Jóváhagyásra váró javaslatok</h3>{% endif %}
+ {% for r in drafts %}{% include "_rule_card.html" %}{% endfor %}
+
+ <h3>Érvényes szabályok</h3>
+ <table>
+ {% for r in approved %}
+  <tr><td>{{ r.text }}<div class="muted">{{ categories.get(r.category, r.category) }} · {{ r.scope_type }} · v{{ r.version }}</div></td>
+  <td><span class="tag sev-{{ r.severity }}">{{ r.severity }}</span></td>
+  <td>{% if can_edit %}<form method="post" action="/campaigns/{{ campaign.id }}/rules/{{ r.id }}/retire"><button class="alt">Kivon</button></form>{% endif %}</td></tr>
+ {% else %}<tr><td class="muted">Még nincs jóváhagyott szabály.</td></tr>{% endfor %}
+ </table>
+</section>

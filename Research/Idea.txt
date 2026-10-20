@@ -1,0 +1,15 @@
+A célunk egy AI alapú audit rendszer megépítése, LLM, system one (pl. Clef-omni decision model, OCR LLM) modellek segítségével.
+A feladat:
+Grafikai ügynökségként promociós anyagokat készítünk, social media felületekre, webre, nyomtatott kiadványokre és POS üzleti kihelyezésekre.
+Ezeknek komplex és folyamatosan bövülö szabályrendszerük van. Legyen az a jogi szöveg tartalmától, a megfelelő logok alkalmazásán át a termékek megnevezésén, elhelyezésén keresztül.
+Az audit rendszer feladata lenne a szabályok ismeretében a kreatív képi tartalmat, vagy a szöveges, webes tartalmat tartalmat ellenőrizni és visszajelzést adni, 
+
+HARDWARE CONSTRAINTS:
+
+The solution should prioritize
+
+A: open-weight models capable of running locally on a workstation equipped with an Nvidia RTX 3090 (24GB VRAM) and 96GB of system RAM. 
+
+OR
+
+B: full Openrouter based API calls.

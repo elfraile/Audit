@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ campaign.name }}{% endblock %}
+{% block content %}
+<p class="muted"><a href="/">Ügyfelek</a> / {{ client.name }}</p>
+<h1>{{ campaign.name }}</h1>
+{% include "_facts.html" %}
+{% include "_assets.html" %}
+{% include "_references.html" %}
+{% include "_issues.html" %}
+{% include "_checklist.html" %}
+{% include "_rules.html" %}
+{% endblock %}

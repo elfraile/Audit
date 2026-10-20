@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Audit{% endblock %}</title>
+<style>
+ body{font-family:system-ui,sans-serif;margin:0;background:#f6f7f9;color:#222}
+ header{background:#1f2a44;color:#fff;padding:.6rem 1.2rem;display:flex;gap:1rem;align-items:center}
+ header a{color:#fff;text-decoration:none} header .sp{flex:1}
+ main{max-width:1000px;margin:1.2rem auto;padding:0 1rem}
+ section,.card{background:#fff;border:1px solid #dde1e7;border-radius:8px;padding:1rem;margin-bottom:1rem}
+ h1,h2,h3{margin:.2rem 0 .6rem} table{width:100%;border-collapse:collapse}
+ td,th{text-align:left;padding:.35rem;border-bottom:1px solid #eee;vertical-align:top}
+ input,select,textarea{padding:.4rem;border:1px solid #bbb;border-radius:4px;font:inherit}
+ textarea{width:100%;box-sizing:border-box} button{padding:.4rem .8rem;border:0;border-radius:4px;background:#2f5bd8;color:#fff;cursor:pointer}
+ button.alt{background:#777} button.bad{background:#b3261e} .row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+ .tag{font-size:.75rem;padding:.1rem .4rem;border-radius:10px;background:#e8ecf5} .sev-blocking{background:#f8d7d4}
+ .muted{color:#777;font-size:.85rem} .err{color:#b3261e}
+</style>
+</head>
+<body>
+<header>
+ <a href="/"><strong>Audit</strong></a>
+ {% if is_admin %}<a href="/admin/users">Felhasználók</a>{% endif %}
+ <span class="sp"></span>
+ {% if user %}<a href="/notifications">Értesítések{% if unread %} <span class="tag" style="background:#f2c14e;color:#222">{{ unread }}</span>{% endif %}</a>
+ <span>{{ user.name }} ({{ user.role }})</span><a href="/logout">Kilépés</a>{% endif %}
+</header>
+<main>{% block content %}{% endblock %}</main>
+</body>
+</html>

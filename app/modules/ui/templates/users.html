@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Felhasználók</h1>
+<section>
+ <table>
+ {% for u, grants in rows %}
+  <tr><td>{{ u.name }}<div class="muted">{{ u.email }}</div></td><td>{{ u.role }}</td>
+  <td>{% for g in grants %}<span class="tag">ügyfél {{ g.client_id }}{% if g.campaign_id %} / kampány {{ g.campaign_id }}{% endif %}</span> {% endfor %}
+   {% if u.role != "admin" %}
+   <form method="post" action="/admin/users/{{ u.id }}/grants" class="row">
+    <select name="client_id">{% for c in clients %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select>
+    <input name="campaign_id" placeholder="Kampány ID (opcionális)" size="12">
+    <button class="alt">Hozzáférés</button>
+   </form>{% endif %}</td></tr>
+ {% endfor %}
+ </table>
+</section>
+<section>
+ <h2>Új felhasználó</h2>
+ <form method="post" action="/admin/users" class="row">
+  <input name="name" placeholder="Név" required><input name="email" type="email" placeholder="E-mail" required>
+  <input name="password" type="password" placeholder="Jelszó" required>
+  <select name="role">{% for r in roles %}<option>{{ r }}</option>{% endfor %}</select>
+  <button>Létrehoz</button>
+ </form>
+</section>
+{% endblock %}

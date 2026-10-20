@@ -1,0 +1,33 @@
+<section id="issues">
+ <h2>Hibalista</h2>
+ {% if can_edit %}
+ <form method="post" action="/campaigns/{{ campaign.id }}/issues">
+  <textarea name="description" rows="2" placeholder="Kért változás vagy hiba leírása" required></textarea>
+  <div class="row" style="margin-top:.4rem">
+   <input name="asset_ref" placeholder="Melyik asset / mutáció / egész kampány">
+   <input name="source" placeholder="Forrás (levél tárgya, dátuma)">
+   <select name="category">
+    {% for key, label in categories.items() %}<option value="{{ key }}" {{ "selected" if key == "unclassified" }}>{{ label }}</option>{% endfor %}
+   </select>
+   <button>Tétel felvétele</button>
+  </div>
+ </form>
+ {% endif %}
+ <h3>Nyitott ({{ open_issues|length }})</h3>
+ <table>
+ {% for i in open_issues %}
+  <tr><td><a href="/issues/{{ i.id }}">{{ i.description }}</a>
+   <div class="muted">{{ i.asset_ref }} {{ "· szabályjavaslat készült" if i.promoted }}</div></td>
+  <td><span class="tag">{{ categories.get(i.category, i.category) }}</span></td></tr>
+ {% else %}<tr><td class="muted">Nincs nyitott tétel.</td></tr>{% endfor %}
+ </table>
+ {% if closed_issues %}
+ <details><summary class="muted">Lezárt tételek ({{ closed_issues|length }})</summary>
+  <table>
+  {% for i in closed_issues %}
+   <tr><td><a href="/issues/{{ i.id }}">{{ i.description }}</a></td><td><span class="tag">{{ i.status }}</span></td></tr>
+  {% endfor %}
+  </table>
+ </details>
+ {% endif %}
+</section>

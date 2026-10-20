@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Ügyfelek és kampányok</h1>
+{% for client, campaigns in clients %}
+<section>
+ <h2><a href="/clients/{{ client.id }}">{{ client.name }}</a></h2>
+ <ul>
+ {% for c in campaigns %}<li><a href="/campaigns/{{ c.id }}">{{ c.name }}</a></li>
+ {% else %}<li class="muted">Még nincs kampány.</li>{% endfor %}
+ </ul>
+ {% if can_edit %}
+ <form method="post" action="/clients/{{ client.id }}/campaigns" class="row">
+  <input name="name" placeholder="Új kampány neve" required><button>Kampány létrehozása</button>
+ </form>
+ {% endif %}
+</section>
+{% else %}
+<p class="muted">Nincs elérhető ügyfél.</p>
+{% endfor %}
+{% if is_admin %}
+<section>
+ <form method="post" action="/clients" class="row">
+  <input name="name" placeholder="Új ügyfél neve" required><button>Ügyfél létrehozása</button>
+ </form>
+</section>
+{% endif %}
+{% endblock %}

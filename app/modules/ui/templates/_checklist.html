@@ -1,0 +1,20 @@
+<section id="checklist">
+ <h2>Leadási jelölők</h2>
+ <table>
+ {% for it in checklist %}
+  <tr>
+   <td style="width:2rem">{{ "✔" if it.done else "○" }}</td>
+   <td>{{ it.label }}<div class="muted">{{ it.note }}</div></td>
+   <td>{% if can_edit %}
+    <form method="post" action="/campaigns/{{ campaign.id }}/checklist/{{ it.id }}/{{ 'undo' if it.done else 'done' }}" style="display:inline"><button class="alt">{{ "Visszavon" if it.done else "Kész" }}</button></form>
+    <form method="post" action="/campaigns/{{ campaign.id }}/checklist/{{ it.id }}/delete" style="display:inline"><button class="bad">Töröl</button></form>
+   {% endif %}</td>
+  </tr>
+ {% else %}<tr><td class="muted">Nincs jelölő.</td></tr>{% endfor %}
+ </table>
+ {% if can_edit %}
+ <form method="post" action="/campaigns/{{ campaign.id }}/checklist" class="row" style="margin-top:.6rem">
+  <input name="label" placeholder="Leadási elvárás" required><input name="note" placeholder="Megjegyzés"><button>Hozzáad</button>
+ </form>
+ {% endif %}
+</section>

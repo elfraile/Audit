@@ -1,0 +1,47 @@
+<section id="references">
+ <h2>Vizuális referencia-tár (Márkaelemek & termékek)</h2>
+ <p class="muted">A jóváhagyott hivatalos logók, termékfotók és csomagolások gyűjteménye a vizuális összehasonlításhoz.</p>
+
+ <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));gap:1rem;margin-top:.8rem">
+  {% for r in references %}
+  <div class="card" style="text-align:center;padding:.8rem">
+   <div style="height:100px;display:flex;align-items:center;justify-content:center;background:#f9f9f9;border-radius:4px;overflow:hidden;margin-bottom:.5rem">
+    <img src="/api/references/{{ r.id }}/image" alt="{{ r.name }}" style="max-height:100%;max-width:100%;object-fit:contain">
+   </div>
+   <strong>{{ r.name }}</strong>
+   <div class="row" style="justify-content:center;margin-top:.4rem">
+    <span class="tag">{{ r.category }}</span>
+    <span class="tag">{{ r.scope_type }}</span>
+   </div>
+   {% if can_edit %}
+   <form method="post" action="/campaigns/{{ campaign.id }}/references/{{ r.id }}/delete" style="margin-top:.6rem">
+    <button class="bad" type="submit" style="padding:.2rem .5rem;font-size:.75rem">Törlés</button>
+   </form>
+   {% endif %}
+  </div>
+  {% else %}
+  <p class="muted" style="grid-column:1/-1">Még nincs feltöltött referencia-elem.</p>
+  {% endfor %}
+ </div>
+
+ {% if can_edit %}
+ <div style="margin-top:1.2rem;background:#f4f5f8;padding:1rem;border-radius:6px">
+  <h4>Új referencia-elem feltöltése</h4>
+  <form method="post" action="/campaigns/{{ campaign.id }}/references" enctype="multipart/form-data" class="row">
+   <input name="name" placeholder="Referencia megnevezése" required style="flex:1;min-width:180px">
+   <select name="category">
+    <option value="logo">Logó / Márkajelzés</option>
+    <option value="product">Termék / Csomagolás</option>
+    <option value="pack">Ajándékcsomag / Fődíj</option>
+    <option value="other">Egyéb elem</option>
+   </select>
+   <select name="scope_type">
+    <option value="campaign">Csak erre a kampányra</option>
+    <option value="{{ client.id }}">Az ügyfél minden kampányára</option>
+   </select>
+   <input type="file" name="file" accept="image/*" required>
+   <button>Feltöltés</button>
+  </form>
+ </div>
+ {% endif %}
+</section>

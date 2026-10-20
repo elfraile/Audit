@@ -1,0 +1,60 @@
+<section id="assets">
+ <h2>Kreatív anyagok (Assetek) & Audit</h2>
+ <table>
+  <tr><th>Fájlnév</th><th>Típus</th><th>Legutóbbi audit</th><th>Művelet</th></tr>
+  {% for a, run in assets %}
+  <tr>
+   <td>
+    <strong>{{ a.name }}</strong>
+    <div class="muted">{{ a.page_count }} oldal · {{ (a.file_size / 1024)|round(1) }} KB</div>
+   </td>
+   <td><span class="tag">{{ a.file_type }}</span></td>
+   <td>
+    {% if run %}
+     <span class="tag sev-{{ 'blocking' if run.status == 'failed' else ('warning' if run.status == 'warning' else 'passed') }}">
+      {{ run.status }}
+     </span>
+     <div class="muted">
+      {{ run.passed_count }} sikeres / {{ run.failed_count }} hiba / {{ run.warning_count }} figyelmeztetés
+     </div>
+    {% else %}
+     <span class="muted">Még nem futott</span>
+    {% endif %}
+   </td>
+   <td>
+    <div class="row">
+     {% if can_edit %}
+     <form method="post" action="/campaigns/{{ campaign.id }}/assets/{{ a.id }}/audit" style="display:inline">
+      <button>{{ "Újra-audit" if run else "Audit indítása" }}</button>
+     </form>
+     {% endif %}
+     {% if run %}
+     <a href="/audits/{{ run.id }}"><button class="alt" type="button">Riport megtekintése</button></a>
+     {% endif %}
+    </div>
+   </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="4" class="muted">Még nincs feltöltött vagy beolvasott kreatív anyag.</td></tr>
+  {% endfor %}
+ </table>
+
+ {% if can_edit %}
+ <div style="margin-top:1rem;display:flex;gap:1.5rem;flex-wrap:wrap">
+  <div style="flex:1;min-width:280px">
+   <h4>Fájl feltöltése</h4>
+   <form method="post" action="/campaigns/{{ campaign.id }}/assets/upload" enctype="multipart/form-data" class="row">
+    <input type="file" name="file" required>
+    <button>Feltöltés és elemzés</button>
+   </form>
+  </div>
+  <div style="flex:1;min-width:280px">
+   <h4>Lokális mappa beolvasása</h4>
+   <form method="post" action="/campaigns/{{ campaign.id }}/assets/scan" class="row">
+    <input name="folder_path" placeholder="Pl. W:\AI\Projects\Audit\..." style="flex:1" required>
+    <button>Mappa beolvasása</button>
+   </form>
+  </div>
+ </div>
+ {% endif %}
+</section>
