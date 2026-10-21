@@ -3,41 +3,6 @@
 {% block content %}
 <div class="w-full space-y-6">
 
-  <!-- KAMPÁNY NÉZETVÁLTÓ FEJLÉC (TABS) -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-container-lowest p-3.5 rounded-xl border border-outline-variant shadow-sm">
-    <div class="flex items-center gap-2">
-      <span class="material-symbols-outlined text-primary text-[22px]">space_dashboard</span>
-      <h1 class="text-base font-bold text-on-surface tracking-tight m-0">{{ campaign.name }} Munkatér</h1>
-    </div>
-
-    <!-- Workspace View Switcher (Tabs) -->
-    <div class="flex items-center bg-surface-container-low p-1 rounded-lg border border-outline-variant overflow-x-auto gap-1 self-start sm:self-center shrink-0 max-w-full" role="tablist">
-      <button class="tab-btn active px-3.5 py-1.5 rounded-md text-xs bg-surface-container-lowest text-primary font-bold shadow-sm whitespace-nowrap cursor-pointer hover:text-primary flex items-center gap-1.5" data-target="channels" onclick="switchCampaignTab('channels', this)">
-        <span class="material-symbols-outlined text-[16px]">dashboard_customize</span>
-        <span>Csatornák</span>
-      </button>
-      <button class="tab-btn px-3.5 py-1.5 rounded-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5" data-target="rules" onclick="switchCampaignTab('rules', this)">
-        <span class="material-symbols-outlined text-[16px]">gavel</span>
-        <span>Szabálykönyv</span>
-      </button>
-      <button class="tab-btn px-3.5 py-1.5 rounded-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5" data-target="creatives" onclick="switchCampaignTab('creatives', this)">
-        <span class="material-symbols-outlined text-[16px]">perm_media</span>
-        <span>Kreatívok</span>
-      </button>
-      <button class="tab-btn px-3.5 py-1.5 rounded-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap flex items-center gap-1.5 cursor-pointer" data-target="issues" onclick="switchCampaignTab('issues', this)">
-        <span class="material-symbols-outlined text-[16px]">flag</span>
-        <span>Hibák</span>
-        {% if open_issues|length > 0 %}
-          <span class="w-4 h-4 rounded-full bg-secondary text-on-secondary text-[10px] flex items-center justify-center font-bold">{{ open_issues|length }}</span>
-        {% endif %}
-      </button>
-      <button class="tab-btn px-3.5 py-1.5 rounded-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5" data-target="facts" onclick="switchCampaignTab('facts', this)">
-        <span class="material-symbols-outlined text-[16px]">fact_check</span>
-        <span>Adatlap</span>
-      </button>
-    </div>
-  </div>
-
 <script>
   const tabSectionMap = {
     overview: 'channels',
@@ -51,29 +16,27 @@
     facts: 'facts'
   };
 
-  function updateTabStyles(clickedBtn) {
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.classList.remove('bg-surface-container-lowest', 'text-primary', 'font-bold', 'shadow-sm');
-      btn.classList.add('text-outline');
+  function updateSidebarStyles(effectiveTab) {
+    document.querySelectorAll('.sidebar-nav-item').forEach(el => {
+      if (el.dataset.nav === effectiveTab) {
+        el.classList.add('bg-surface-container-high', 'text-primary', 'font-bold', 'border-l-4', 'border-primary');
+        el.classList.remove('text-on-surface-variant', 'text-outline');
+      } else {
+        el.classList.remove('bg-surface-container-high', 'text-primary', 'font-bold', 'border-l-4', 'border-primary');
+        el.classList.add('text-on-surface-variant');
+      }
     });
-    if (clickedBtn) {
-      clickedBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'font-bold', 'shadow-sm');
-      clickedBtn.classList.remove('text-outline');
-    }
   }
 
-  function switchCampaignTab(tabId, clickedBtn) {
+  function switchCampaignTab(tabId) {
     const effectiveTab = tabSectionMap[tabId] || tabId;
     const targetPane = document.getElementById(effectiveTab);
-    const targetBtn = clickedBtn || document.querySelector(`.tab-btn[data-target="${effectiveTab}"]`);
 
     if (targetPane) {
       document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
       targetPane.classList.add('active');
     }
-    if (targetBtn) {
-      updateTabStyles(targetBtn);
-    }
+    updateSidebarStyles(effectiveTab);
     if (history.pushState) {
       history.pushState(null, null, '#' + tabId);
     }
@@ -97,25 +60,25 @@
 </script>
 
 <!-- TAB TARTALMAK -->
-<div id="channels" class="tab-pane active space-y-6 mt-6">
+<div id="channels" class="tab-pane active space-y-6">
   {% include "_channels.html" %}
 </div>
 
-<div id="rules" class="tab-pane space-y-6 mt-6">
+<div id="rules" class="tab-pane space-y-6">
   {% include "_rules.html" %}
 </div>
 
-<div id="creatives" class="tab-pane space-y-6 mt-6">
+<div id="creatives" class="tab-pane space-y-6">
   {% include "_assets.html" %}
   {% include "_references.html" %}
 </div>
 
-<div id="issues" class="tab-pane space-y-6 mt-6">
+<div id="issues" class="tab-pane space-y-6">
   {% include "_issues.html" %}
   {% include "_checklist.html" %}
 </div>
 
-<div id="facts" class="tab-pane space-y-6 mt-6">
+<div id="facts" class="tab-pane space-y-6">
   {% include "_facts.html" %}
 </div>
 

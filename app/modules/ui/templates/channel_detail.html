@@ -4,49 +4,7 @@
 {% block content %}
 <div class="w-full space-y-6">
 
-  <!-- CSATORNA VÁLTÓ SÁV (CHANNEL SWITCHER TABS) -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-surface-container-low p-2.5 rounded-xl border border-outline-variant">
-    <div class="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 md:pb-0">
-      <span class="text-xs font-bold text-outline uppercase tracking-wider px-2 shrink-0">Csatorna:</span>
-      {% for ch in channels %}
-        {% set ch_sum = channel_summaries.get(ch.id, {}) %}
-        {% set is_active = (ch.id == channel.id) %}
-        <a href="/campaigns/{{ campaign.id }}/channels/{{ ch.id }}"
-           class="px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition-all
-                  {% if is_active %}
-                    bg-surface-container-lowest text-primary shadow-sm border border-outline-variant/60 font-bold
-                  {% else %}
-                    text-outline hover:text-on-surface hover:bg-surface-container-high/60
-                  {% endif %}">
-          <span class="material-symbols-outlined text-[16px]">
-            {% if ch.code == 'social' %}share
-            {% elif ch.code == 'press' %}newspaper
-            {% elif ch.code == 'pos' %}storefront
-            {% elif ch.code == 'web' %}language
-            {% else %}folder{% endif %}
-          </span>
-          <span>{{ ch.name }}</span>
-          {% if ch_sum %}
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-mono
-              {% if ch_sum.status == 'ready' %}bg-emerald-100 text-emerald-800
-              {% elif ch_sum.status == 'failed' %}bg-error-container text-error
-              {% else %}bg-surface-container-highest text-on-surface-variant{% endif %}">
-              {{ ch_sum.assigned }}/{{ ch_sum.total }}
-            </span>
-          {% endif %}
-        </a>
-      {% endfor %}
-    </div>
-
-    <div class="shrink-0 flex items-center gap-2">
-      <a href="/campaigns/{{ campaign.id }}" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold border border-outline-variant inline-flex items-center gap-1 transition-colors">
-        <span class="material-symbols-outlined text-[16px]">arrow_back</span>
-        Kampány Központ
-      </a>
-    </div>
-  </div>
-
-  <!-- 3. CSATORNA FEJLÉC & SUMMARY KÁRTYA -->
+  <!-- CSATORNA FEJLÉC & SUMMARY KÁRTYA -->
   <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div class="space-y-1">
       <div class="flex items-center gap-2">
