@@ -1,22 +1,38 @@
-<div class="card">
- <form method="post" action="/campaigns/{{ campaign.id }}/rules/{{ r.id }}/edit">
-  <textarea name="text" rows="2">{{ r.text }}</textarea>
-  {% if r.note %}<p class="muted">Kérdés: {{ r.note }}</p>{% endif %}
-  <div class="row" style="margin-top:.4rem">
-   <select name="category">
-    {% for key, label in categories.items() %}<option value="{{ key }}" {{ "selected" if key == r.category }}>{{ label }}</option>{% endfor %}
-   </select>
-   <select name="severity">
-    {% for s in ("blocking", "warning", "advice") %}<option {{ "selected" if s == r.severity }}>{{ s }}</option>{% endfor %}
-   </select>
-   <span class="tag">{{ r.scope_type }}</span>
-   {% if can_edit %}<button class="alt">Mentés</button>{% endif %}
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-3">
+  <form method="post" action="/campaigns/{{ campaign.id }}/rules/{{ r.id }}/edit" class="flex flex-col gap-2">
+    <textarea class="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary text-on-surface" name="text" rows="2">{{ r.text }}</textarea>
+    {% if r.note %}
+      <p class="font-body-sm text-[11px] text-tertiary bg-tertiary-fixed/30 p-2 rounded flex items-center gap-1">
+        <span class="material-symbols-outlined text-[14px]">help</span> Kérdés: {{ r.note }}
+      </p>
+    {% endif %}
+
+    <div class="flex flex-wrap items-center gap-2 mt-1">
+      <select class="px-2 py-1 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-[11px] focus:ring-1 focus:ring-primary text-on-surface" name="category">
+        {% for key, label in categories.items() %}<option value="{{ key }}" {{ "selected" if key == r.category }}>{{ label }}</option>{% endfor %}
+      </select>
+      <select class="px-2 py-1 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-[11px] focus:ring-1 focus:ring-primary text-on-surface uppercase" name="severity">
+        {% for s in ("blocking", "warning", "advice") %}<option value="{{ s }}" {{ "selected" if s == r.severity }}>{{ s }}</option>{% endfor %}
+      </select>
+      <span class="px-2 py-1 rounded bg-surface-container text-on-surface-variant font-mono text-[10px] uppercase font-bold tracking-wider border border-outline-variant/30">{{ r.scope_type }}</span>
+      {% if can_edit %}
+        <button class="px-3 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-semibold transition-colors border border-outline-variant ml-auto">Mentés</button>
+      {% endif %}
+    </div>
+  </form>
+
+  {% if can_edit %}
+  <div class="flex items-center gap-2 border-t border-outline-variant/60 pt-3">
+    <form method="post" action="/campaigns/{{ campaign.id }}/rules/{{ r.id }}/approve" class="flex-1">
+      <button class="w-full px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-semibold transition-colors flex items-center justify-center gap-1">
+        <span class="material-symbols-outlined text-[16px]">check_circle</span> Jóváhagy
+      </button>
+    </form>
+    <form method="post" action="/campaigns/{{ campaign.id }}/rules/{{ r.id }}/reject" class="flex-1">
+      <button class="w-full px-3 py-1.5 rounded-lg bg-error-container text-error hover:bg-error-container/80 border border-error/20 text-xs font-semibold transition-colors flex items-center justify-center gap-1">
+        <span class="material-symbols-outlined text-[16px]">cancel</span> Elvet
+      </button>
+    </form>
   </div>
- </form>
- {% if can_edit %}
- <div class="row" style="margin-top:.4rem">
-  <form method="post" action="/campaigns/{{ campaign.id }}/rules/{{ r.id }}/approve"><button>Jóváhagy</button></form>
-  <form method="post" action="/campaigns/{{ campaign.id }}/rules/{{ r.id }}/reject"><button class="bad">Elvet</button></form>
- </div>
- {% endif %}
+  {% endif %}
 </div>

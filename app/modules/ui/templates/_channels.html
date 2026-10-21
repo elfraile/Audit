@@ -1,133 +1,165 @@
-<section id="channels">
- <h2>Promóciós Anyagcsoportok & Várt Anyagok (Mátrix)</h2>
-
- {% if channels %}
-  <div style="display:flex;flex-direction:column;gap:1.5rem">
-   {% for ch in channels %}
-   <div class="card" style="border-top:4px solid #1f2a44">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem">
-     <div>
-      <h3 style="margin:0;display:inline">{{ ch.name }}</h3>
-      <span class="tag" style="margin-left:.5rem">{{ ch.code }}</span>
-      {% if ch.description %}
-      <p class="muted" style="margin:.3rem 0 0">{{ ch.description }}</p>
-      {% endif %}
-     </div>
-     {% if can_edit %}
-     <form method="post" action="/campaigns/{{ campaign.id }}/channels/{{ ch.id }}/delete" onsubmit="return confirm('Biztosan törlöd a csoportot és a tételeit?')">
-      <button class="bad alt" style="padding:.2rem .5rem;font-size:.8rem">Csoport törlése</button>
-     </form>
-     {% endif %}
-    </div>
-
-    <!-- Várt anyagok ebben a csoportban -->
-    <table style="margin-top:1rem;font-size:.9rem">
-     <tr>
-      <th>Várt Promóciós Anyag</th>
-      <th>Specifikáció</th>
-      <th>Kért Képi Szöveg & Posztszöveg</th>
-      <th>Csatolt Kreatív & Audit</th>
-     </tr>
-     {% set ch_delivs = deliverables_by_channel.get(ch.id, []) %}
-     {% for d in ch_delivs %}
-     {% set asset = asset_by_id.get(d.asset_id) %}
-     {% set run = latest_run_by_asset.get(d.asset_id) if d.asset_id else None %}
-     <tr>
-      <td>
-       <strong>{{ d.name }}</strong>
-       {% if d.file_pattern %}
-       <div class="muted">Minta: <code>{{ d.file_pattern }}</code></div>
-       {% endif %}
-      </td>
-      <td>{{ d.specs or "—" }}</td>
-      <td>
-       {% if d.expected_copy %}
-       <div><strong>Képre:</strong> <em>"{{ d.expected_copy }}"</em></div>
-       {% endif %}
-       {% if d.post_copy %}
-       <div class="muted" style="font-size:.8rem;margin-top:.2rem"><strong>Poszt:</strong> {{ d.post_copy[:80] }}...</div>
-       {% endif %}
-       {% if not d.expected_copy and not d.post_copy %}
-       <span class="muted">—</span>
-       {% endif %}
-      </td>
-      <td>
-       {% if asset %}
-        <div>
-         <strong>{{ asset.name }}</strong>
-         {% if run %}
-          <span class="tag sev-{{ 'blocking' if run.status == 'failed' else ('warning' if run.status == 'warning' else 'passed') }}" style="font-size:.75rem">
-           {{ run.status }}
-          </span>
-          <a href="/audits/{{ run.id }}" style="font-size:.8rem;margin-left:.3rem">Riport</a>
-         {% else %}
-          <span class="muted" style="font-size:.8rem">Nincs még audit</span>
-         {% endif %}
-        </div>
-       {% else %}
-        <span class="tag sev-warning" style="font-size:.8rem">⚠️ Még nem készült el</span>
-       {% endif %}
-      </td>
-     </tr>
-     {% else %}
-     <tr><td colspan="4" class="muted">Még nincs várt anyag definiálva ebben a csoportban.</td></tr>
-     {% endfor %}
-    </table>
-
-    {% if can_edit %}
-    <details style="margin-top:.8rem;font-size:.85rem">
-     <summary>+ Új várt anyag hozzáadása a(z) <strong>{{ ch.name }}</strong> csoporthoz</summary>
-     <form method="post" action="/campaigns/{{ campaign.id }}/channels/{{ ch.id }}/deliverables" style="margin-top:.6rem;background:#f9f9f9;padding:.8rem;border-radius:4px">
-      <div class="row" style="gap:.5rem">
-       <input name="name" placeholder="Anyag megnevezése (pl. FB Poszt #1)" style="flex:2" required>
-       <input name="specs" placeholder="Specifikáció (pl. 1080x1080)" style="flex:1">
-       <input name="file_pattern" placeholder="Fájlnév minta (pl. FB_01*)" style="flex:1">
-      </div>
-      <div style="margin-top:.5rem">
-       <textarea name="expected_copy" placeholder="Képre kért kötelező szöveg (amit a képen látni kell)..." rows="2" style="width:100%"></textarea>
-      </div>
-      <div style="margin-top:.5rem">
-       <textarea name="post_copy" placeholder="Posztszöveg / caption (Facebook kísérőszöveg, ha social)..." rows="2" style="width:100%"></textarea>
-      </div>
-      <div style="margin-top:.5rem">
-       <button type="submit">Várt anyag mentése</button>
-      </div>
-     </form>
-    </details>
-    {% endif %}
-   </div>
-   {% endfor %}
+<div id="channels" class="space-y-6">
+  <div class="flex items-center gap-2">
+    <span class="material-symbols-outlined text-primary text-headline-sm" data-icon="dashboard_customize">dashboard_customize</span>
+    <h2 class="font-headline-sm text-base text-on-surface font-semibold m-0">Promóciós Anyagcsoportok & Várt Anyagok (Mátrix)</h2>
   </div>
- {% else %}
-  <p class="muted">Még nincs létrehozva anyagcsoport ehhez a kampányhoz.</p>
- {% endif %}
 
- {% if can_edit %}
- <div class="card" style="margin-top:1.5rem;background:#fcfdff">
-  <h4>+ Új Anyagcsoport / Csatorna felvétele</h4>
-  <form method="post" action="/campaigns/{{ campaign.id }}/channels" class="row" style="gap:.6rem;align-items:flex-end">
-   <div style="flex:2">
-    <label style="font-size:.85rem;display:block">Csoport neve (pl. Facebook / Social, Újsághirdetések, POS Display):</label>
-    <input name="name" placeholder="Megnevezés..." style="width:100%" required>
-   </div>
-   <div style="flex:1">
-    <label style="font-size:.85rem;display:block">Típus:</label>
-    <select name="code" style="width:100%">
-     <option value="social">Social (Facebook, IG)</option>
-     <option value="press">Újsághirdetés / Sajtó</option>
-     <option value="pos">POS / Display</option>
-     <option value="web">Web / Digitális</option>
-     <option value="other">Egyéb</option>
-    </select>
-   </div>
-   <div style="flex:2">
-    <label style="font-size:.85rem;display:block">Leírás:</label>
-    <input name="description" placeholder="Rövid megjegyzés..." style="width:100%">
-   </div>
-   <div>
-    <button>Csoport létrehozása</button>
-   </div>
-  </form>
- </div>
- {% endif %}
-</section>
+  {% if channels %}
+    <div class="space-y-6">
+      {% for ch in channels %}
+      <div class="bg-surface-container-lowest rounded-xl border-t-4 border-t-inverse-surface border border-outline-variant shadow-sm overflow-hidden">
+        <div class="p-4 bg-surface-container-low border-b border-outline-variant flex flex-wrap justify-between items-start gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-headline-sm text-sm text-on-surface font-bold m-0">{{ ch.name }}</h3>
+              <span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-mono text-xs font-semibold">{{ ch.code }}</span>
+            </div>
+            {% if ch.description %}
+            <p class="font-body-sm text-xs text-outline mt-1">{{ ch.description }}</p>
+            {% endif %}
+          </div>
+          {% if can_edit %}
+          <form method="post" action="/campaigns/{{ campaign.id }}/channels/{{ ch.id }}/delete" onsubmit="return confirm('Biztosan törlöd a csoportot és a tételeit?')">
+            <button class="px-2.5 py-1.5 rounded-lg border border-error/30 text-error hover:bg-error-container text-xs font-semibold transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">delete</span> Csoport törlése
+            </button>
+          </form>
+          {% endif %}
+        </div>
+
+        <!-- Várt anyagok ebben a csoportban -->
+        <div class="overflow-x-auto w-full">
+          <table class="w-full text-left border-collapse table-auto">
+            <thead>
+              <tr class="bg-surface border-b border-outline-variant text-on-surface font-label-sm text-label-sm uppercase tracking-wider">
+                <th class="py-3 px-4 font-bold">Várt Promóciós Anyag</th>
+                <th class="py-3 px-4 font-bold">Specifikáció</th>
+                <th class="py-3 px-4 font-bold">Kért Képi Szöveg & Posztszöveg</th>
+                <th class="py-3 px-4 font-bold">Csatolt Kreatív & Audit</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/50 font-body-sm text-body-sm">
+              {% set ch_delivs = deliverables_by_channel.get(ch.id, []) %}
+              {% for d in ch_delivs %}
+              {% set asset = asset_by_id.get(d.asset_id) %}
+              {% set run = latest_run_by_asset.get(d.asset_id) if d.asset_id else None %}
+              <tr class="hover:bg-surface-container-low/60 transition-colors">
+                <td class="py-3 px-4">
+                  <strong class="font-semibold text-on-surface block">{{ d.name }}</strong>
+                  {% if d.file_pattern %}
+                  <div class="text-[11px] text-outline mt-1">Minta: <code class="bg-surface-container px-1 py-0.5 rounded">{{ d.file_pattern }}</code></div>
+                  {% endif %}
+                </td>
+                <td class="py-3 px-4 text-on-surface">{{ d.specs or "—" }}</td>
+                <td class="py-3 px-4 space-y-2">
+                  {% if d.expected_copy %}
+                  <div class="p-2 bg-surface-container-low rounded border border-outline-variant/50 text-xs italic">
+                    "{{ d.expected_copy }}"
+                  </div>
+                  {% endif %}
+                  {% if d.post_copy %}
+                  <div class="text-[11px] text-outline">
+                    <strong class="text-on-surface">Poszt:</strong> {{ d.post_copy[:80] }}...
+                  </div>
+                  {% endif %}
+                  {% if not d.expected_copy and not d.post_copy %}
+                  <span class="text-outline">—</span>
+                  {% endif %}
+                </td>
+                <td class="py-3 px-4">
+                  {% if asset %}
+                    <div>
+                      <strong class="block text-on-surface">{{ asset.name }}</strong>
+                      {% if run %}
+                        <div class="mt-1 flex items-center gap-2">
+                          {% if run.status == 'failed' %}
+                            <span class="px-2 py-0.5 rounded bg-error-container text-error text-[10px] font-bold border border-error/20">ELBUKOTT</span>
+                          {% elif run.status == 'warning' %}
+                            <span class="px-2 py-0.5 rounded bg-tertiary-fixed text-tertiary text-[10px] font-bold border border-tertiary/20">FIGYELMEZTETÉS</span>
+                          {% else %}
+                            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">MEGFELELT</span>
+                          {% endif %}
+                          <a href="/audits/{{ run.id }}" class="text-[11px] text-primary hover:underline">Riport</a>
+                        </div>
+                      {% else %}
+                        <span class="text-[11px] text-outline mt-1 block">Nincs még audit</span>
+                      {% endif %}
+                    </div>
+                  {% else %}
+                    <span class="inline-flex items-center gap-1 font-medium text-tertiary bg-tertiary-fixed px-2 py-0.5 rounded-md text-[11px]">
+                      <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Még nem készült el
+                    </span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" class="py-4 px-4 text-center text-outline">Még nincs várt anyag definiálva ebben a csoportban.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {% if can_edit %}
+        <div class="p-4 bg-surface-container-low border-t border-outline-variant">
+          <details class="text-sm group">
+            <summary class="cursor-pointer font-semibold text-primary hover:text-primary-container flex items-center gap-1 select-none">
+              <span class="material-symbols-outlined text-[18px] transition-transform group-open:rotate-90">chevron_right</span>
+              + Új várt anyag hozzáadása a(z) {{ ch.name }} csoporthoz
+            </summary>
+            <form method="post" action="/campaigns/{{ campaign.id }}/channels/{{ ch.id }}/deliverables" class="mt-4 bg-surface-container-lowest p-4 rounded-lg border border-outline-variant shadow-sm space-y-3">
+              <div class="flex flex-col sm:flex-row gap-3">
+                <input class="flex-[2] px-3 py-1.5 border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary" name="name" placeholder="Anyag megnevezése (pl. FB Poszt #1)" required>
+                <input class="flex-1 px-3 py-1.5 border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary" name="specs" placeholder="Specifikáció (pl. 1080x1080)">
+                <input class="flex-1 px-3 py-1.5 border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary" name="file_pattern" placeholder="Fájlnév minta (pl. FB_01*)">
+              </div>
+              <div>
+                <textarea class="w-full px-3 py-2 border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary" name="expected_copy" placeholder="Képre kért kötelező szöveg (amit a képen látni kell)..." rows="2"></textarea>
+              </div>
+              <div>
+                <textarea class="w-full px-3 py-2 border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary" name="post_copy" placeholder="Posztszöveg / caption (Facebook kísérőszöveg, ha social)..." rows="2"></textarea>
+              </div>
+              <div>
+                <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-on-primary font-label-md hover:bg-primary-container transition-colors shadow-sm text-xs">Várt anyag mentése</button>
+              </div>
+            </form>
+          </details>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-outline text-sm italic">Még nincs létrehozva anyagcsoport ehhez a kampányhoz.</p>
+  {% endif %}
+
+  {% if can_edit %}
+  <div class="bg-primary-fixed/20 p-5 rounded-xl border border-primary/20 shadow-sm mt-8">
+    <h4 class="font-headline-sm text-sm text-primary font-bold mb-3 flex items-center gap-1">
+      <span class="material-symbols-outlined text-[18px]">add_box</span> + Új Anyagcsoport / Csatorna felvétele
+    </h4>
+    <form method="post" action="/campaigns/{{ campaign.id }}/channels" class="flex flex-col md:flex-row gap-4 items-start md:items-end">
+      <div class="flex-[2] w-full">
+        <label class="font-label-sm text-xs text-on-surface block mb-1">Csoport neve:</label>
+        <input class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary" name="name" placeholder="Pl. Facebook / Social, Újsághirdetések..." required>
+      </div>
+      <div class="flex-1 w-full">
+        <label class="font-label-sm text-xs text-on-surface block mb-1">Típus:</label>
+        <select class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary" name="code">
+          <option value="social">Social (Facebook, IG)</option>
+          <option value="press">Újsághirdetés / Sajtó</option>
+          <option value="pos">POS / Display</option>
+          <option value="web">Web / Digitális</option>
+          <option value="other">Egyéb</option>
+        </select>
+      </div>
+      <div class="flex-[2] w-full">
+        <label class="font-label-sm text-xs text-on-surface block mb-1">Leírás:</label>
+        <input class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary" name="description" placeholder="Rövid megjegyzés...">
+      </div>
+      <div class="w-full md:w-auto">
+        <button type="submit" class="w-full px-4 py-2 rounded-lg bg-primary text-on-primary font-label-md hover:bg-primary-container transition-colors shadow-sm text-xs whitespace-nowrap">Csoport létrehozása</button>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+</div>

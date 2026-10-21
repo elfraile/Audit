@@ -1,38 +1,85 @@
-<section>
- <h2>Szabályok</h2>
- {% if can_edit %}
- <form method="post" action="/campaigns/{{ campaign.id }}/rules/suggest">
-  <p class="muted">Illessz be ügyfél-levelet, briefet vagy szabályszöveget; a rendszer szabálykártyákat javasol.</p>
-  <textarea name="text" rows="5" required></textarea>
-  <div class="row" style="margin-top:.4rem">
-   <select name="scope_type">
-    <option value="campaign">Csak erre a kampányra</option>
-    <option value="client">Az ügyfél minden kampányára</option>
-   </select>
-   {% if channels %}
-   <select name="channel_id">
-    <option value="">(Minden csatornára)</option>
-    {% for ch in channels %}
-    <option value="{{ ch.id }}">Csak: {{ ch.name }}</option>
-    {% endfor %}
-   </select>
-   {% endif %}
-   <input type="hidden" name="scope_id" value="{{ client.id }}">
-   <input name="source" placeholder="Forrás (pl. levél tárgya, dátuma)">
-   <button>Szabályok javaslása</button>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden w-full">
+  <div class="p-4 bg-surface-container-low border-b border-outline-variant flex items-center gap-2">
+    <span class="material-symbols-outlined text-primary text-headline-sm" data-icon="rule">rule</span>
+    <h2 class="font-headline-sm text-base text-on-surface font-semibold m-0">Szabályok & Compliance</h2>
   </div>
- </form>
- {% endif %}
 
- {% if drafts %}<h3>Jóváhagyásra váró javaslatok</h3>{% endif %}
- {% for r in drafts %}{% include "_rule_card.html" %}{% endfor %}
+  {% if can_edit %}
+  <div class="p-4 border-b border-outline-variant/60 bg-primary-fixed/10">
+    <form method="post" action="/campaigns/{{ campaign.id }}/rules/suggest" class="space-y-3">
+      <p class="font-body-sm text-xs text-outline">Illessz be ügyfél-levelet, briefet vagy szabályszöveget; a rendszer szabálykártyákat javasol.</p>
+      <textarea class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary text-on-surface" name="text" rows="3" required></textarea>
+      <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <select class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary w-full sm:w-auto" name="scope_type">
+          <option value="campaign">Csak erre a kampányra</option>
+          <option value="client">Az ügyfél minden kampányára</option>
+        </select>
+        {% if channels %}
+        <select class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary w-full sm:w-auto" name="channel_id">
+          <option value="">(Minden csatornára)</option>
+          {% for ch in channels %}
+          <option value="{{ ch.id }}">Csak: {{ ch.name }}</option>
+          {% endfor %}
+        </select>
+        {% endif %}
+        <input type="hidden" name="scope_id" value="{{ client.id }}">
+        <input class="flex-1 px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs focus:ring-1 focus:ring-primary w-full sm:w-auto" name="source" placeholder="Forrás (pl. levél tárgya, dátuma)">
+        <button class="px-4 py-1.5 rounded-lg bg-primary text-on-primary font-label-md hover:bg-primary-container transition-colors shadow-sm text-xs w-full sm:w-auto whitespace-nowrap">Szabályok javaslása</button>
+      </div>
+    </form>
+  </div>
+  {% endif %}
 
- <h3>Érvényes szabályok</h3>
- <table>
- {% for r in approved %}
-  <tr><td>{{ r.text }}<div class="muted">{{ categories.get(r.category, r.category) }} · {{ r.scope_type }} · v{{ r.version }}</div></td>
-  <td><span class="tag sev-{{ r.severity }}">{{ r.severity }}</span></td>
-  <td>{% if can_edit %}<form method="post" action="/campaigns/{{ campaign.id }}/rules/{{ r.id }}/retire"><button class="alt">Kivon</button></form>{% endif %}</td></tr>
- {% else %}<tr><td class="muted">Még nincs jóváhagyott szabály.</td></tr>{% endfor %}
- </table>
-</section>
+  {% if drafts %}
+  <div class="p-4 bg-tertiary-fixed/20 border-b border-outline-variant/60">
+    <h3 class="font-headline-sm text-sm text-tertiary font-semibold mb-3 flex items-center gap-1">
+      <span class="material-symbols-outlined text-[18px]">pending_actions</span> Jóváhagyásra váró javaslatok
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {% for r in drafts %}{% include "_rule_card.html" %}{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="p-4">
+    <h3 class="font-headline-sm text-sm text-on-surface font-semibold mb-3 flex items-center gap-1">
+      <span class="material-symbols-outlined text-[18px]">verified</span> Érvényes szabályok
+    </h3>
+    <div class="overflow-x-auto w-full rounded-lg border border-outline-variant">
+      <table class="w-full text-left border-collapse table-auto">
+        <tbody class="divide-y divide-outline-variant/50 font-body-sm text-body-sm">
+        {% for r in approved %}
+          <tr class="hover:bg-surface-container-low/60 transition-colors">
+            <td class="py-3 px-4">
+              <div class="font-medium text-on-surface mb-1">{{ r.text }}</div>
+              <div class="text-[11px] text-outline flex items-center gap-1.5">
+                <span class="px-1.5 py-0.5 rounded bg-surface-container">{{ categories.get(r.category, r.category) }}</span>
+                <span>•</span>
+                <span>{{ r.scope_type }}</span>
+                <span>•</span>
+                <span class="font-mono">v{{ r.version }}</span>
+              </div>
+            </td>
+            <td class="py-3 px-4 w-28">
+              {% if r.severity == 'blocking' %}
+                <span class="px-2 py-0.5 rounded bg-error-container text-error text-[10px] font-bold border border-error/20 inline-block uppercase">{{ r.severity }}</span>
+              {% else %}
+                <span class="px-2 py-0.5 rounded bg-secondary-fixed text-secondary text-[10px] font-bold border border-secondary/20 inline-block uppercase">{{ r.severity }}</span>
+              {% endif %}
+            </td>
+            <td class="py-3 px-4 w-20 text-right">
+              {% if can_edit %}
+              <form method="post" action="/campaigns/{{ campaign.id }}/rules/{{ r.id }}/retire" onsubmit="return confirm('Kivonod ezt a szabályt?')">
+                <button class="px-2 py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface text-[11px] font-semibold transition-colors">Kivon</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="3" class="py-4 px-4 text-center text-outline">Még nincs jóváhagyott szabály.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

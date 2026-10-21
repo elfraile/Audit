@@ -1,28 +1,90 @@
 {% extends "base.html" %}
 {% block title %}{{ campaign.name }}{% endblock %}
 {% block content %}
-<p class="muted"><a href="/">Ügyfelek</a> / {{ client.name }}</p>
-<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
- <h1>{{ campaign.name }}</h1>
- {% if delivery %}
-  <div>
-   {% if delivery.ready %}
-    <span class="tag sev-passed" style="font-size:1rem;padding:.4rem .8rem;font-weight:bold">
-     ✓ LEADÁSRA KÉSZ (Minden tétel lezárva)
-    </span>
-   {% else %}
-    <span class="tag sev-warning" style="font-size:0.9rem;padding:.3rem .6rem">
-     Leadás függőben: {{ delivery.open_issues }} nyitott hiba · {{ delivery.failed_assets }} audit hiba · {{ delivery.pending_checklist }} pipa hiányzik
-    </span>
-   {% endif %}
+<div class="w-full space-y-6">
+
+  <!-- 1. CAMPAIGN HEADER -->
+  <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-surface-container-lowest p-space-lg rounded-xl border border-outline-variant shadow-sm">
+    <div class="space-y-1">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-outline text-body-sm"><a href="/" class="hover:text-on-surface">Ügyfelek</a></span>
+        <span class="text-outline text-body-sm">•</span>
+        <span class="font-body-sm text-body-sm text-outline">{{ client.name }}</span>
+      </div>
+      <h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight">{{ campaign.name }}</h1>
+      {% if delivery %}
+        <div class="mt-2">
+          {% if delivery.ready %}
+            <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-label-md border border-emerald-200 shadow-sm inline-flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">check_circle</span>
+              LEADÁSRA KÉSZ (Minden tétel lezárva)
+            </span>
+          {% else %}
+            <span class="px-2 py-0.5 rounded-full bg-error-container text-error font-label-md border border-error/20 shadow-sm inline-flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">warning</span>
+              Leadás függőben: {{ delivery.open_issues }} nyitott hiba · {{ delivery.failed_assets }} audit hiba · {{ delivery.pending_checklist }} pipa hiányzik
+            </span>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Primary Workspace View Switcher (Tabs) -->
+    <div class="flex items-center bg-surface-container-low p-1.5 rounded-xl border border-outline-variant overflow-x-auto gap-1 self-start xl:self-center shrink-0 max-w-full" role="tablist">
+      <button class="tab-btn active px-4 py-2 rounded-lg font-label-md text-label-md bg-surface-container-lowest text-primary font-semibold shadow-sm whitespace-nowrap cursor-pointer hover:text-primary" data-target="overview" onclick="openTab(event, 'overview'); updateTabStyles(this)">
+        Áttekintés
+      </button>
+      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-label-md text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer" data-target="creatives" onclick="openTab(event, 'creatives'); updateTabStyles(this)">
+        Kreatívok & Referenciák
+      </button>
+      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-label-md text-outline hover:text-on-surface transition-colors whitespace-nowrap flex items-center gap-2 cursor-pointer" data-target="issues" onclick="openTab(event, 'issues'); updateTabStyles(this)">
+        <span>Hibák & Ellenőrzés</span>
+        {% if open_issues|length > 0 %}
+          <span class="w-5 h-5 rounded-full bg-secondary text-on-secondary text-[11px] flex items-center justify-center font-bold">{{ open_issues|length }}</span>
+        {% endif %}
+      </button>
+    </div>
   </div>
- {% endif %}
+
+<script>
+  function updateTabStyles(clickedBtn) {
+    // Reset all tabs to inactive styles
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('bg-surface-container-lowest', 'text-primary', 'font-semibold', 'shadow-sm');
+      btn.classList.add('text-outline');
+    });
+    // Add active styles to clicked tab
+    clickedBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'font-semibold', 'shadow-sm');
+    clickedBtn.classList.remove('text-outline');
+  }
+
+  // Hook into the existing openTab function on load to style the correct initial tab
+  document.addEventListener("DOMContentLoaded", () => {
+    const hash = window.location.hash.substring(1);
+    let targetBtn = document.querySelector(`.tab-btn[data-target="${hash}"]`);
+    if(!targetBtn) {
+       targetBtn = document.querySelector('.tab-btn');
+    }
+    if(targetBtn) {
+       updateTabStyles(targetBtn);
+    }
+  });
+</script>
+
+<div id="overview" class="tab-pane active space-y-6 mt-6">
+  {% include "_facts.html" %}
+  {% include "_rules.html" %}
+  {% include "_channels.html" %}
 </div>
-{% include "_facts.html" %}
-{% include "_channels.html" %}
-{% include "_assets.html" %}
-{% include "_references.html" %}
-{% include "_issues.html" %}
-{% include "_checklist.html" %}
-{% include "_rules.html" %}
+
+<div id="creatives" class="tab-pane">
+  {% include "_assets.html" %}
+  {% include "_references.html" %}
+</div>
+
+<div id="issues" class="tab-pane">
+  {% include "_issues.html" %}
+  {% include "_checklist.html" %}
+</div>
+</div>
 {% endblock %}
