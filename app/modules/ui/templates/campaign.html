@@ -3,40 +3,37 @@
 {% block content %}
 <div class="w-full space-y-6">
 
-  <!-- 1. MINDIG ELÉRHETŐ KAMPÁNY FACTSHEET SÁV (RIBBON) -->
-  {% include "_factsheet_ribbon.html" %}
-
-  <!-- 2. KAMPÁNY VEZÉRLŐPULT FEJLÉC ÉS NÉZETVÁLTÓ (TABS) -->
-  <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-surface-container-lowest p-4 rounded-xl border border-outline-variant shadow-sm">
-    <div>
-      <h1 class="text-xl font-bold text-on-surface tracking-tight m-0">{{ campaign.name }}</h1>
-      <p class="text-xs text-outline mt-0.5">Ügyfél: <strong class="text-on-surface">{{ client.name }}</strong></p>
+  <!-- KAMPÁNY NÉZETVÁLTÓ FEJLÉC (TABS) -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-container-lowest p-3.5 rounded-xl border border-outline-variant shadow-sm">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary text-[22px]">space_dashboard</span>
+      <h1 class="text-base font-bold text-on-surface tracking-tight m-0">{{ campaign.name }} Munkatér</h1>
     </div>
 
-    <!-- Primary Workspace View Switcher (Tabs) -->
-    <div class="flex items-center bg-surface-container-low p-1.5 rounded-xl border border-outline-variant overflow-x-auto gap-1 self-start xl:self-center shrink-0 max-w-full" role="tablist">
-      <button class="tab-btn active px-4 py-2 rounded-lg font-label-md text-xs bg-surface-container-lowest text-primary font-bold shadow-sm whitespace-nowrap cursor-pointer hover:text-primary flex items-center gap-1.5" data-target="channels" onclick="switchCampaignTab('channels', this)">
-        <span class="material-symbols-outlined text-[18px]">dashboard_customize</span>
-        <span>Csatornák (Munkaterek)</span>
+    <!-- Workspace View Switcher (Tabs) -->
+    <div class="flex items-center bg-surface-container-low p-1 rounded-lg border border-outline-variant overflow-x-auto gap-1 self-start sm:self-center shrink-0 max-w-full" role="tablist">
+      <button class="tab-btn active px-3.5 py-1.5 rounded-md text-xs bg-surface-container-lowest text-primary font-bold shadow-sm whitespace-nowrap cursor-pointer hover:text-primary flex items-center gap-1.5" data-target="channels" onclick="switchCampaignTab('channels', this)">
+        <span class="material-symbols-outlined text-[16px]">dashboard_customize</span>
+        <span>Csatornák</span>
       </button>
-      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5" data-target="rules" onclick="switchCampaignTab('rules', this)">
-        <span class="material-symbols-outlined text-[18px]">gavel</span>
+      <button class="tab-btn px-3.5 py-1.5 rounded-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5" data-target="rules" onclick="switchCampaignTab('rules', this)">
+        <span class="material-symbols-outlined text-[16px]">gavel</span>
         <span>Szabálykönyv</span>
       </button>
-      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5" data-target="creatives" onclick="switchCampaignTab('creatives', this)">
-        <span class="material-symbols-outlined text-[18px]">perm_media</span>
-        <span>Kreatívok & Fájlok</span>
+      <button class="tab-btn px-3.5 py-1.5 rounded-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5" data-target="creatives" onclick="switchCampaignTab('creatives', this)">
+        <span class="material-symbols-outlined text-[16px]">perm_media</span>
+        <span>Kreatívok</span>
       </button>
-      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap flex items-center gap-1.5 cursor-pointer" data-target="issues" onclick="switchCampaignTab('issues', this)">
-        <span class="material-symbols-outlined text-[18px]">flag</span>
-        <span>Hibák & Ellenőrzés</span>
+      <button class="tab-btn px-3.5 py-1.5 rounded-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap flex items-center gap-1.5 cursor-pointer" data-target="issues" onclick="switchCampaignTab('issues', this)">
+        <span class="material-symbols-outlined text-[16px]">flag</span>
+        <span>Hibák</span>
         {% if open_issues|length > 0 %}
-          <span class="w-5 h-5 rounded-full bg-secondary text-on-secondary text-[11px] flex items-center justify-center font-bold">{{ open_issues|length }}</span>
+          <span class="w-4 h-4 rounded-full bg-secondary text-on-secondary text-[10px] flex items-center justify-center font-bold">{{ open_issues|length }}</span>
         {% endif %}
       </button>
-      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5" data-target="facts" onclick="switchCampaignTab('facts', this)">
-        <span class="material-symbols-outlined text-[18px]">fact_check</span>
-        <span>Teljes Adatlap</span>
+      <button class="tab-btn px-3.5 py-1.5 rounded-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5" data-target="facts" onclick="switchCampaignTab('facts', this)">
+        <span class="material-symbols-outlined text-[16px]">fact_check</span>
+        <span>Adatlap</span>
       </button>
     </div>
   </div>

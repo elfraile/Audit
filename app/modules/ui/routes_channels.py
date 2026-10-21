@@ -44,6 +44,11 @@ def channel_workspace(campaign_id: int, channel_id: int, request: Request,
     }
     current_summary = channel_summaries.get(channel_id, {})
 
+    all_deliverables = channel_service.list_deliverables(db, campaign_id)
+    deliverables_by_channel = {}
+    for d in all_deliverables:
+        deliverables_by_channel.setdefault(d.channel_id, []).append(d)
+
     deliverables = channel_service.list_deliverables(db, campaign_id, channel_id=channel_id)
     assets_raw = asset_service.list_assets(db, campaign_id)
     asset_by_id = {a.id: a for a in assets_raw}
@@ -80,10 +85,14 @@ def channel_workspace(campaign_id: int, channel_id: int, request: Request,
         channel_summaries=channel_summaries,
         current_summary=current_summary,
         deliverables=deliverables,
+        all_deliverables=all_deliverables,
+        deliverables_by_channel=deliverables_by_channel,
         asset_by_id=asset_by_id,
         latest_run_by_asset=latest_run_by_asset,
         channel_rules=channel_rules,
         inherited_rules=inherited_rules,
+        approved=all_rules,
+        open_issues=open_campaign_issues,
         channel_issues=channel_issues,
         facts=facts,
         facts_dict=facts_dict,

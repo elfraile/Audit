@@ -1,0 +1,210 @@
+<!-- VERTICAL SIDEBAR (Oldalsó Fő Vezérlőmenü) -->
+<aside id="appSidebar" class="hidden lg:flex flex-col justify-between w-64 xl:w-72 bg-surface-container-lowest border-r border-outline-variant shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto p-3 space-y-4 select-none">
+
+  <!-- FELSŐ SZEKCIÓ: ÜGYFÉL & KAMPÁNY FŐ VEZÉRLŐ HIERARCHIA -->
+  <div class="space-y-3">
+    <!-- Ügyfél & Kampány Kártya -->
+    <div class="p-3 bg-surface-container-low rounded-xl border border-outline-variant/60 shadow-2xs space-y-1.5">
+      <div class="flex items-center justify-between text-outline">
+        <div class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider">
+          <span class="material-symbols-outlined text-[16px] text-primary">corporate_fare</span>
+          <span class="truncate">{{ client.name }}</span>
+        </div>
+        <a href="/" class="text-[10px] text-primary hover:underline font-semibold" title="Ügyfélváltás">Váltás</a>
+      </div>
+      <div>
+        <a href="/campaigns/{{ campaign.id }}" class="font-bold text-xs text-on-surface hover:text-primary transition-colors line-clamp-1 block" title="{{ campaign.name }}">
+          {{ campaign.name }}
+        </a>
+      </div>
+    </div>
+
+    <!-- SZEPARÁTOR -->
+    <div class="h-px bg-outline-variant/50 my-2"></div>
+
+    <!-- FŐ NAVIGÁCIÓS FA (Munkaterek, Csatornák, Szabályok) -->
+    <nav class="space-y-1">
+
+      <!-- 1. Kampány Áttekintés -->
+      <a href="/campaigns/{{ campaign.id }}"
+         class="sidebar-nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all
+                {% if not channel and not request.url.fragment %}bg-surface-container-high text-primary font-bold border-l-4 border-primary{% else %}text-outline hover:text-on-surface hover:bg-surface-container-low{% endif %}"
+         data-nav="channels" onclick="if(window.switchCampaignTab){ switchCampaignTab('channels'); }">
+        <span class="material-symbols-outlined text-[18px]">dashboard</span>
+        <span>Kampány Áttekintés</span>
+      </a>
+
+      <!-- 2. Csatornák (Anyagcsoportok) Lenyíló Fa -->
+      <div class="pt-2">
+        <div class="flex items-center justify-between px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-outline">
+          <div class="flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">view_column</span>
+            <span>Csatornák ({{ channels|length }})</span>
+          </div>
+          {% if can_edit %}
+          <a href="/campaigns/{{ campaign.id }}#channels" class="text-primary hover:text-primary-container font-bold text-[13px]" title="Új csatorna felvétele">+</a>
+          {% endif %}
+        </div>
+
+        <div class="space-y-0.5 mt-1">
+          {% for ch in channels %}
+            {% set ch_sum = channel_summaries.get(ch.id, {}) %}
+            {% set is_active_channel = (channel is defined and channel and channel.id == ch.id) %}
+            {% set ch_delivs = deliverables_by_channel.get(ch.id, []) %}
+
+            <div class="rounded-lg overflow-hidden group">
+              <!-- Csatorna Fejléc Link -->
+              <a href="/campaigns/{{ campaign.id }}/channels/{{ ch.id }}"
+                 class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all
+                        {% if is_active_channel %}
+                          bg-primary-fixed/40 text-primary font-bold border-l-4 border-primary
+                        {% else %}
+                          text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low
+                        {% endif %}">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="material-symbols-outlined text-[16px] shrink-0
+                    {% if is_active_channel %}text-primary{% else %}text-outline group-hover:text-primary{% endif %}">
+                    {% if ch.code == 'social' %}share
+                    {% elif ch.code == 'press' %}newspaper
+                    {% elif ch.code == 'pos' %}storefront
+                    {% elif ch.code == 'web' %}language
+                    {% else %}folder{% endif %}
+                  </span>
+                  <span class="truncate">{{ ch.name }}</span>
+                </div>
+
+                <!-- Haladási jelvény -->
+                <span class="px-1.5 py-0.2 rounded text-[10px] font-mono shrink-0
+                  {% if ch_sum.status == 'ready' %}bg-emerald-100 text-emerald-800
+                  {% elif ch_sum.status == 'failed' %}bg-error-container text-error
+                  {% elif ch_sum.status == 'pending' %}bg-surface-container-highest text-tertiary font-bold
+                  {% else %}bg-surface-container text-outline{% endif %}">
+                  {{ ch_sum.assigned or 0 }}/{{ ch_sum.total or 0 }}
+                </span>
+              </a>
+
+              <!-- Csatorna alatti Slotok (Várt Anyagok) Listája -->
+              {% if ch_delivs and (is_active_channel or channels|length <= 4) %}
+                <div class="pl-7 pr-2 py-1 space-y-0.5">
+                  {% for d in ch_delivs %}
+                    <a href="/campaigns/{{ campaign.id }}/channels/{{ ch.id }}#deliverable-{{ d.id }}"
+                       class="flex items-center justify-between py-1 px-2 rounded text-[11px] text-outline hover:text-on-surface hover:bg-surface-container/50 transition-colors truncate">
+                      <span class="truncate" title="{{ d.name }}">• {{ d.name }}</span>
+                      {% if d.asset_id %}
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 ml-1" title="Csatolva"></span>
+                      {% else %}
+                        <span class="w-1.5 h-1.5 rounded-full bg-tertiary-container shrink-0 ml-1" title="Hiányzik"></span>
+                      {% endif %}
+                    </a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- SZEPARÁTOR -->
+      <div class="h-px bg-outline-variant/40 my-2"></div>
+
+      <!-- 3. Szabálykönyv & Compliance Fa -->
+      <div>
+        <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-outline flex items-center justify-between">
+          <div class="flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">gavel</span>
+            <span>Szabálykönyv</span>
+          </div>
+          <span class="text-[10px] font-mono text-outline">{{ approved|length }}</span>
+        </div>
+
+        <div class="space-y-0.5 mt-1">
+          <a href="/campaigns/{{ campaign.id }}#rules"
+             class="sidebar-nav-item flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
+             data-nav="rules" onclick="if(window.switchCampaignTab){ switchCampaignTab('rules'); }">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[15px] text-outline">tune</span>
+              <span>Szabály Explorer</span>
+            </div>
+          </a>
+          <a href="/campaigns/{{ campaign.id }}#rules"
+             class="flex items-center justify-between px-3 py-1 pl-6 rounded text-[11px] text-outline hover:text-on-surface hover:bg-surface-container-low transition-colors"
+             onclick="if(window.switchCampaignTab){ switchCampaignTab('rules'); if(window.filterRulesByScope){ filterRulesByScope('client'); } }">
+            <span>🏢 Ügyfél Brandbook</span>
+            <span class="text-[10px] font-mono">{{ client_rules|length if client_rules is defined else 0 }}</span>
+          </a>
+          <a href="/campaigns/{{ campaign.id }}#rules"
+             class="flex items-center justify-between px-3 py-1 pl-6 rounded text-[11px] text-outline hover:text-on-surface hover:bg-surface-container-low transition-colors"
+             onclick="if(window.switchCampaignTab){ switchCampaignTab('rules'); if(window.filterRulesByScope){ filterRulesByScope('campaign'); } }">
+            <span>🎯 Kampány Általános</span>
+            <span class="text-[10px] font-mono">{{ campaign_rules|length if campaign_rules is defined else 0 }}</span>
+          </a>
+          <a href="/campaigns/{{ campaign.id }}#rules"
+             class="flex items-center justify-between px-3 py-1 pl-6 rounded text-[11px] text-outline hover:text-on-surface hover:bg-surface-container-low transition-colors"
+             onclick="if(window.switchCampaignTab){ switchCampaignTab('rules'); if(window.filterRulesByScope){ filterRulesByScope('channel'); } }">
+            <span>📱 Csatorna-specifikus</span>
+            <span class="text-[10px] font-mono">{{ channel_rules|length if channel_rules is defined else 0 }}</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- SZEPARÁTOR -->
+      <div class="h-px bg-outline-variant/40 my-2"></div>
+
+      <!-- 4. Kreatív Fájlok & Referenciák -->
+      <a href="/campaigns/{{ campaign.id }}#creatives"
+         class="sidebar-nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
+         data-nav="creatives" onclick="if(window.switchCampaignTab){ switchCampaignTab('creatives'); }">
+        <span class="material-symbols-outlined text-[18px] text-outline">perm_media</span>
+        <span>Kreatívok & Fájlok</span>
+      </a>
+
+      <!-- 5. Hibák & Ellenőrzőlista (Kiemelt badge-dzsel) -->
+      <a href="/campaigns/{{ campaign.id }}#issues"
+         class="sidebar-nav-item flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
+         data-nav="issues" onclick="if(window.switchCampaignTab){ switchCampaignTab('issues'); }">
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-[18px] text-error">flag</span>
+          <span>Hibák & Checklist</span>
+        </div>
+        {% if open_issues and open_issues|length > 0 %}
+          <span class="px-2 py-0.2 rounded-full bg-error-container text-error text-[10px] font-bold">
+            {{ open_issues|length }}
+          </span>
+        {% else %}
+          <span class="text-[10px] text-emerald-600 font-bold">✓ 0</span>
+        {% endif %}
+      </a>
+
+      <!-- 6. Teljes Tényadatlap & QA -->
+      <a href="/campaigns/{{ campaign.id }}#facts"
+         class="sidebar-nav-item flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
+         data-nav="facts" onclick="if(window.switchCampaignTab){ switchCampaignTab('facts'); }">
+        <span class="material-symbols-outlined text-[18px] text-outline">fact_check</span>
+        <span>Tényadatlap & QA</span>
+      </a>
+
+    </nav>
+  </div>
+
+  <!-- ALSÓ SZEKCIÓ: LEADÁSI ÁLLAPOT KIS KÁRTYA -->
+  <div class="pt-2 border-t border-outline-variant/50">
+    {% if delivery %}
+      <div class="p-2.5 rounded-xl border {% if delivery.ready %}bg-emerald-50/80 border-emerald-200 text-emerald-800{% else %}bg-error-container/40 border-error/20 text-error{% endif %}">
+        <div class="flex items-center gap-1.5 font-bold text-[11px] mb-1">
+          <span class="material-symbols-outlined text-[16px]">
+            {% if delivery.ready %}check_circle{% else %}pending_actions{% endif %}
+          </span>
+          <span>{% if delivery.ready %}Leadásra kész{% else %}Leadás függőben{% endif %}</span>
+        </div>
+        <p class="text-[10px] leading-tight m-0 text-on-surface-variant">
+          {% if delivery.ready %}
+            Minden tétel megfelel a szabályoknak.
+          {% else %}
+            {{ delivery.open_issues }} hiba · {{ delivery.missing_deliverables }} hiányzó slot
+          {% endif %}
+        </p>
+      </div>
+    {% endif %}
+  </div>
+
+</aside>

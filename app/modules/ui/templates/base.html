@@ -123,6 +123,7 @@
 </style>
 </head>
 <body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+
 <!-- TOP APP BAR -->
 <header class="bg-surface-container-lowest border-b border-outline-variant shadow-sm top-0 z-30 sticky w-full">
 <div class="flex flex-wrap items-center justify-between px-4 lg:px-6 w-full min-h-[4rem] py-2 gap-y-3">
@@ -133,7 +134,53 @@
       </div>
       <a href="/" class="text-headline-sm font-headline-sm font-bold text-primary tracking-tight whitespace-nowrap">Audit Workspace</a>
     </div>
+
+    <!-- PROMO HEADLINE A FEJBE -->
+    {% if campaign is defined and campaign %}
+      <div class="h-6 w-px bg-outline-variant/60 hidden sm:block"></div>
+      <div class="hidden sm:flex items-center gap-2 flex-wrap text-xs">
+        {% if client is defined and client %}
+          <span class="text-outline font-semibold uppercase tracking-wider">{{ client.name }}</span>
+          <span class="text-outline">/</span>
+        {% endif %}
+        <a href="/campaigns/{{ campaign.id }}" class="font-bold text-on-surface hover:text-primary transition-colors">
+          {{ campaign.name }}
+        </a>
+      </div>
+    {% endif %}
   </div>
+
+  <!-- HEADLINE TÉNYADATOK (PROMO HIGHLIGHTS & READINESS A FEJLÉCBEN) -->
+  {% if campaign is defined and campaign %}
+  <div class="hidden xl:flex items-center gap-2 text-xs">
+    {% if facts_dict is defined and facts_dict %}
+      {% if facts_dict.get('promocio_idoszak') %}
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-low border border-outline-variant/50" title="Promóció időszaka">
+        <span class="material-symbols-outlined text-primary text-[15px]">calendar_month</span>
+        <span class="font-semibold text-on-surface">{{ facts_dict.get('promocio_idoszak') }}</span>
+      </div>
+      {% endif %}
+      {% if facts_dict.get('fodij') %}
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-low border border-outline-variant/50" title="Fődíj">
+        <span class="material-symbols-outlined text-primary text-[15px]">trophy</span>
+        <span class="font-semibold text-on-surface max-w-[180px] truncate">{{ facts_dict.get('fodij') }}</span>
+      </div>
+      {% endif %}
+    {% endif %}
+
+    {% if delivery is defined and delivery %}
+      {% if delivery.ready %}
+        <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 inline-flex items-center gap-1">
+          <span class="material-symbols-outlined text-[15px]">check_circle</span> LEADÁSRA KÉSZ
+        </span>
+      {% else %}
+        <span class="px-2.5 py-1 rounded-full bg-error-container text-error text-xs font-bold border border-error/20 inline-flex items-center gap-1" title="{{ delivery.open_issues }} nyitott hiba, {{ delivery.missing_deliverables }} hiányzó slot">
+          <span class="material-symbols-outlined text-[15px]">warning</span> Leadás függőben
+        </span>
+      {% endif %}
+    {% endif %}
+  </div>
+  {% endif %}
 
   <div class="flex items-center gap-4 shrink-0 flex-nowrap">
     {% if is_admin %}
@@ -160,42 +207,41 @@
   </div>
 </div>
 </header>
-<main class="flex-1 overflow-y-auto px-4 lg:px-8 py-6 w-full mx-auto max-w-7xl">
-{% block content %}{% endblock %}
-</main>
+
+<div class="flex flex-1 w-full overflow-hidden">
+  {% if campaign is defined and campaign and channels is defined and channels %}
+    {% include "_sidebar.html" %}
+  {% endif %}
+  <main class="flex-1 overflow-y-auto px-4 lg:px-8 py-6 {% if campaign is defined and campaign and channels is defined and channels %}bg-surface min-w-0{% else %}w-full mx-auto max-w-7xl{% endif %}">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
 <script>
  function openTab(event, tabId) {
-   // Hide all tab panes
    const tabPanes = document.querySelectorAll('.tab-pane');
    tabPanes.forEach(pane => pane.classList.remove('active'));
 
-   // Remove active class from all tab buttons
    const tabBtns = document.querySelectorAll('.tab-btn');
    tabBtns.forEach(btn => btn.classList.remove('active'));
 
-   // Show the selected tab pane and mark button as active
-   document.getElementById(tabId).classList.add('active');
+   const targetEl = document.getElementById(tabId);
+   if(targetEl) targetEl.classList.add('active');
+
    if(event && event.currentTarget) {
      event.currentTarget.classList.add('active');
    }
 
-   // Optional: Save active tab to localStorage or URL hash
    if(history.pushState) {
        history.pushState(null, null, '#' + tabId);
    }
  }
 
- // Initialize tabs based on URL hash or default to first tab
  document.addEventListener("DOMContentLoaded", () => {
     const hash = window.location.hash.substring(1);
     const tabBtn = document.querySelector(`.tab-btn[data-target="${hash}"]`);
     if(hash && tabBtn && document.getElementById(hash)) {
         openTab({currentTarget: tabBtn}, hash);
-    } else {
-        const firstBtn = document.querySelector('.tab-btn');
-        if(firstBtn) {
-            openTab({currentTarget: firstBtn}, firstBtn.dataset.target);
-        }
     }
  });
 </script>
