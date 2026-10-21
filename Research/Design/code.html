@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+
+<html lang="hu"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Audit Workspace - Kreatívok &amp; Anyagmátrix (Csatorna Munkaterek)</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary": "#dc4c64",
+            "on-secondary-fixed": "#40000e",
+            "surface-tint": "#2857c5",
+            "on-error-container": "#93000a",
+            "primary": "#194cba",
+            "on-primary-container": "#edefff",
+            "primary-fixed": "#dbe1ff",
+            "on-tertiary-container": "#ffebe4",
+            "tertiary": "#86411c",
+            "inverse-on-surface": "#eef0ff",
+            "on-primary-fixed-variant": "#003ea8",
+            "on-tertiary-fixed": "#351000",
+            "surface-container-highest": "#d9e2ff",
+            "primary-fixed-dim": "#b4c5ff",
+            "surface-container": "#e9edff",
+            "tertiary-container": "#e78e63",
+            "on-tertiary-fixed-variant": "#753410",
+            "on-primary-fixed": "#00174b",
+            "on-secondary-fixed-variant": "#8b162e",
+            "surface-container-lowest": "#ffffff",
+            "inverse-surface": "#25304a",
+            "error": "#dc4c64",
+            "surface-variant": "#d9e2ff",
+            "inverse-primary": "#b4c5ff",
+            "surface-container-low": "#f2f3ff",
+            "outline-variant": "#c3c6d5",
+            "on-error": "#ffffff",
+            "surface-container-high": "#e1e7ff",
+            "on-background": "#0f1b34",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed-dim": "#ffb2b7",
+            "on-secondary-container": "#70001f",
+            "secondary-fixed": "#fde4e7",
+            "on-surface-variant": "#434653",
+            "error-container": "#fee8ea",
+            "background": "#faf8ff",
+            "tertiary-fixed-dim": "#ffb694",
+            "tertiary-fixed": "#ffdbcc",
+            "surface-bright": "#faf8ff",
+            "secondary-container": "#f59fa0",
+            "outline": "#747685",
+            "on-surface": "#0f1b34",
+            "on-primary": "#ffffff",
+            "primary-container": "#3b66d4",
+            "surface": "#faf8ff",
+            "on-secondary": "#ffffff",
+            "surface-dim": "#cfd9fb"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin-desktop": "2rem",
+            "space-xl": "2rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem",
+            "space-sm": "0.5rem",
+            "gutter-desktop": "1.5rem",
+            "gutter": "1rem",
+            "space-2xl": "3rem"
+          },
+          "fontFamily": {
+            "body-md": ["Inter"],
+            "display-lg-mobile": ["Inter"],
+            "headline-sm": ["Inter"],
+            "label-md": ["Inter"],
+            "label-sm": ["Inter"],
+            "headline-lg": ["Inter"],
+            "label-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "headline-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "display-lg": ["Inter"]
+          },
+          "fontSize": {
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex flex-col selection:bg-surface-container-highest">
+<!-- TOP APP BAR -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm top-0 z-30 sticky w-full">
+<div class="flex flex-wrap items-center justify-between px-4 lg:px-6 w-full min-h-[4rem] py-2 gap-y-3">
+<!-- Brand & Breadcrumbs -->
+<div class="flex items-center gap-4 flex-wrap">
+<div class="flex items-center gap-2 shrink-0">
+<div class="w-9 h-9 rounded-lg bg-primary-container flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-headline-sm" data-icon="fact_check">fact_check</span>
+</div>
+<span class="text-headline-sm font-headline-sm font-bold text-primary dark:text-inverse-primary tracking-tight whitespace-nowrap">Audit Workspace</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm whitespace-nowrap font-medium">v2.4 Pro</span>
+</div>
+<div class="hidden xl:flex items-center text-outline font-label-md text-label-md pl-4 border-l border-outline-variant whitespace-nowrap">
+<span class="hover:text-on-surface transition-colors cursor-pointer">Ügyfelek</span>
+<span class="material-symbols-outlined text-body-sm mx-1" data-icon="chevron_right">chevron_right</span>
+<span class="hover:text-on-surface transition-colors cursor-pointer">Spar Magyarország</span>
+<span class="material-symbols-outlined text-body-sm mx-1" data-icon="chevron_right">chevron_right</span>
+<span class="text-on-surface font-semibold bg-surface-container-low px-2 py-0.5 rounded">Nyári Fesztivál 2025</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden lg:flex items-center gap-6 shrink-0">
+<a class="text-on-surface-variant dark:text-surface-variant font-label-lg text-label-lg hover:text-on-surface dark:hover:text-inverse-on-surface py-2 transition-colors whitespace-nowrap" href="#overview">Overview</a>
+<a class="border-b-2 border-primary dark:border-inverse-primary text-primary dark:text-inverse-primary font-label-lg text-label-lg py-2 font-semibold whitespace-nowrap" href="#matrix">Creatives &amp; Matrix</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-lg text-label-lg hover:text-on-surface dark:hover:text-inverse-on-surface py-2 transition-colors whitespace-nowrap" href="#checklist">Issues &amp; Checklist</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-lg text-label-lg hover:text-on-surface dark:hover:text-inverse-on-surface py-2 transition-colors whitespace-nowrap" href="#reports">Audit Reports</a>
+</nav>
+<!-- Trailing Action Cluster -->
+<div class="flex items-center gap-2.5 shrink-0 flex-nowrap">
+<div class="hidden 2xl:flex items-center gap-1.5 bg-tertiary-fixed border border-tertiary-container/30 text-on-tertiary-fixed px-3 py-1.5 rounded-full shadow-sm whitespace-nowrap">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+<span class="font-label-sm text-label-sm font-semibold">Leadás: 2 hiba · 1 audit hiba</span>
+</div>
+<button class="px-3.5 py-2 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container transition-colors duration-150 flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap shrink-0">
+<span class="material-symbols-outlined text-headline-sm" data-icon="file_download">file_download</span>
+<span>Export Report</span>
+</button>
+<button class="px-3.5 py-2 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary transition-all duration-150 flex items-center gap-1.5 shadow-sm active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap shrink-0">
+<span class="material-symbols-outlined text-headline-sm" data-icon="play_arrow">play_arrow</span>
+<span>Run Full Audit</span>
+</button>
+<div class="flex items-center pl-2 gap-1 border-l border-outline-variant shrink-0">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors relative" title="Notifications">
+<span class="material-symbols-outlined text-headline-sm" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-secondary rounded-full ring-2 ring-surface-container-lowest"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors" title="Help">
+<span class="material-symbols-outlined text-headline-sm" data-icon="help">help</span>
+</button>
+</div>
+<div class="flex items-center gap-2 pl-2 border-l border-outline-variant shrink-0">
+<div class="w-8 h-8 rounded-full bg-primary-fixed text-primary font-semibold flex items-center justify-center font-label-sm text-label-sm ring-1 ring-primary/20 shrink-0">KA</div>
+<div class="hidden sm:block text-left whitespace-nowrap">
+<p class="font-label-md text-label-md text-on-surface leading-tight font-medium">Kovács Anna</p>
+<p class="font-body-sm text-[11px] text-outline leading-tight">Senior Auditor</p>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- WORKSPACE BODY -->
+<div class="flex flex-1 w-full overflow-hidden">
+<!-- VERTICAL SIDEBAR -->
+<aside class="hidden lg:flex flex-col justify-between h-[calc(100vh-4rem)] w-64 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant dark:border-outline p-space-md shrink-0">
+<!-- Upper Section -->
+<div class="space-y-space-md">
+<!-- Header Info -->
+<div class="flex items-center gap-space-sm pb-space-sm border-b border-outline-variant">
+<div class="w-10 h-10 rounded-lg bg-inverse-surface text-inverse-on-surface flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+</div>
+<div class="overflow-hidden">
+<p class="text-headline-sm font-headline-sm font-bold text-on-surface truncate">OmniAgency Global</p>
+<p class="font-body-sm text-body-sm text-outline">Enterprise Tier</p>
+</div>
+</div>
+<!-- CTA -->
+<button class="w-full py-2.5 px-space-md rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-headline-sm" data-icon="add">add</span>
+<span>New Asset Upload</span>
+</button>
+<!-- Primary Tabs -->
+<nav class="space-y-1">
+<a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg bg-surface-container-high dark:bg-surface-variant text-primary dark:text-inverse-primary font-label-md text-label-md font-medium border-l-4 border-primary dark:border-inverse-primary" href="#">
+<span class="material-symbols-outlined text-headline-sm" data-icon="folder_open">folder_open</span>
+<span>Campaign Hub</span>
+</a>
+<a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant font-label-md text-label-md hover:bg-surface-container dark:hover:bg-surface-container-high hover:text-on-surface dark:hover:text-inverse-on-surface transition-all" href="#">
+<span class="material-symbols-outlined text-headline-sm" data-icon="photo_library">photo_library</span>
+<span>Asset Library</span>
+</a>
+<a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant font-label-md text-label-md hover:bg-surface-container dark:hover:bg-surface-container-high hover:text-on-surface dark:hover:text-inverse-on-surface transition-all" href="#">
+<span class="material-symbols-outlined text-headline-sm" data-icon="verified_user">verified_user</span>
+<span>Brand Compliance</span>
+</a>
+<a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant font-label-md text-label-md hover:bg-surface-container dark:hover:bg-surface-container-high hover:text-on-surface dark:hover:text-inverse-on-surface transition-all" href="#">
+<span class="material-symbols-outlined text-headline-sm" data-icon="rule">rule</span>
+<span>Matrix Rules</span>
+</a>
+<a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant font-label-md text-label-md hover:bg-surface-container dark:hover:bg-surface-container-high hover:text-on-surface dark:hover:text-inverse-on-surface transition-all" href="#">
+<span class="material-symbols-outlined text-headline-sm" data-icon="fact_check">fact_check</span>
+<span>Factsheet QA</span>
+</a>
+<a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg text-on-surface-variant dark:text-surface-variant font-label-md text-label-md hover:bg-surface-container dark:hover:bg-surface-container-high hover:text-on-surface dark:hover:text-inverse-on-surface transition-all" href="#">
+<span class="material-symbols-outlined text-headline-sm" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+</div>
+<!-- Footer Action Links -->
+<div class="pt-space-md border-t border-outline-variant space-y-1">
+<a class="flex items-center gap-space-sm px-space-md py-2 rounded-lg text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-headline-sm" data-icon="description">description</span>
+<span>Workspace Docs</span>
+</a>
+<a class="flex items-center gap-space-sm px-space-md py-2 rounded-lg text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-headline-sm" data-icon="history">history</span>
+<span>Audit Logs</span>
+</a>
+<div class="mt-4 p-space-sm bg-surface-container-low rounded-lg text-body-sm text-outline flex items-center justify-between">
+<span>Engine: Claude 3.7 QA</span>
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+</div>
+</div>
+</aside>
+<!-- MAIN INTERACTIVE CANVAS -->
+<main class="flex-1 overflow-y-auto px-4 lg:px-8 py-6 bg-surface min-w-0">
+<div class="w-full space-y-6">
+<!-- 1. CAMPAIGN HEADER -->
+<div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-surface-container-lowest p-space-lg rounded-xl border border-outline-variant shadow-sm">
+<div class="space-y-1">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="px-2.5 py-0.5 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-semibold">Kampány Kód: SPAR-FEST-25</span>
+<span class="text-outline text-body-sm">•</span>
+<span class="font-body-sm text-body-sm text-outline">Utolsó automata vizsgálat: 12 perce</span>
+<span class="text-outline text-body-sm">•</span>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">Leadási határidő: 2025.05.20 (4 nap maradt)</span>
+</div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight">Nyári Fesztivál 2025 Promóciós Audit</h1>
+</div>
+<!-- Primary Workspace View Switcher -->
+<div class="flex items-center bg-surface-container-low p-1.5 rounded-xl border border-outline-variant overflow-x-auto gap-1 self-start xl:self-center shrink-0 max-w-full">
+<button class="px-4 py-2 rounded-lg font-label-md text-label-md bg-surface-container-lowest text-primary font-semibold shadow-sm whitespace-nowrap">
+      Kreatívok &amp; Anyagmátrix
+    </button>
+<button class="px-4 py-2 rounded-lg font-label-md text-label-md text-outline hover:text-on-surface transition-colors whitespace-nowrap">
+      Kampány Tényadatok &amp; Szabályok
+    </button>
+<button class="px-4 py-2 rounded-lg font-label-md text-label-md text-outline hover:text-on-surface transition-colors whitespace-nowrap flex items-center gap-2">
+<span>Hibalista &amp; Checklist</span>
+<span class="w-5 h-5 rounded-full bg-secondary text-on-secondary text-[11px] flex items-center justify-center font-bold">2</span>
+</button>
+</div>
+</div>
+<!-- 2. KIEMELT KAMPÁNYTÍPUS / CSATORNA MUNKATÉR VÁLASZTÓ (DEDIKÁLT CSOPORTOK) -->
+<div class="bg-surface-container-lowest p-2.5 lg:p-3 rounded-2xl border border-outline-variant shadow-sm">
+<div class="flex items-center justify-between pb-2 px-1 border-b border-outline-variant/50 mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-headline-sm" data-icon="dashboard_customize">dashboard_customize</span>
+<span class="font-headline-sm text-xs uppercase tracking-wider text-on-surface font-bold">Dedikált Csatorna Munkaterek (Válassz típust)</span>
+</div>
+<span class="text-xs text-outline font-medium">Összesen 13 várt anyag 3 dedikált csoportban</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2.5">
+<!-- Channel Tab 1: ACTIVE - Facebook & Social -->
+<button class="text-left p-3.5 rounded-xl bg-primary-fixed/35 border-2 border-primary text-on-surface shadow-sm relative group transition-all flex flex-col justify-between">
+<div class="flex items-start justify-between w-full mb-2">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[19px]" data-icon="share">share</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-sm font-bold text-primary">Facebook &amp; Social</span>
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+</div>
+<p class="font-body-sm text-[11px] text-outline">Meta Feed, Stories, Reels</p>
+</div>
+</div>
+<span class="font-label-sm text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-primary text-on-primary shrink-0">Aktív Munkatér</span>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-primary/20 w-full text-xs">
+<span class="font-semibold text-primary">6 anyag rögzítve</span>
+<span class="inline-flex items-center gap-1 font-semibold text-secondary bg-secondary-fixed px-2 py-0.5 rounded-md">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> 1 hiba
+        </span>
+</div>
+</button>
+<!-- Channel Tab 2: Sajtó & Nyomtatott Hirdetések -->
+<button class="text-left p-3.5 rounded-xl bg-surface-container-low hover:bg-surface-container-high/60 border border-outline-variant text-on-surface transition-all flex flex-col justify-between group">
+<div class="flex items-start justify-between w-full mb-2">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-tertiary-fixed text-tertiary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[19px]" data-icon="newspaper">newspaper</span>
+</div>
+<div>
+<span class="font-headline-sm text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">Sajtó &amp; Nyomtatott (Print)</span>
+<p class="font-body-sm text-[11px] text-outline">Metropol, Blikk, Helyi sajtó</p>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-outline-variant/60 w-full text-xs">
+<span class="text-outline">3 anyag rögzítve</span>
+<span class="inline-flex items-center gap-1 font-medium text-tertiary bg-tertiary-fixed px-2 py-0.5 rounded-md">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> 1 figyelmeztetés
+        </span>
+</div>
+</button>
+<!-- Channel Tab 3: POS & In-Store Display -->
+<button class="text-left p-3.5 rounded-xl bg-surface-container-low hover:bg-surface-container-high/60 border border-outline-variant text-on-surface transition-all flex flex-col justify-between group">
+<div class="flex items-start justify-between w-full mb-2">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-secondary-fixed text-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[19px]" data-icon="storefront">storefront</span>
+</div>
+<div>
+<span class="font-headline-sm text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">POS &amp; In-Store Display</span>
+<p class="font-body-sm text-[11px] text-outline">Totem, Kassza zóna, Padlómatrica</p>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-outline-variant/60 w-full text-xs">
+<span class="text-outline">4 anyag tervezve</span>
+<span class="inline-flex items-center gap-1 font-medium text-outline bg-surface-container px-2 py-0.5 rounded-md">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span> 2 hiányzó feltöltés
+        </span>
+</div>
+</button>
+<!-- Action Tab: + Új Kampánytípus / Csatorna felvétele -->
+<button class="p-3.5 rounded-xl border-2 border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-low text-primary transition-all flex flex-col items-center justify-center text-center gap-1 group">
+<div class="w-8 h-8 rounded-full bg-surface-container-high group-hover:bg-primary-fixed flex items-center justify-center text-primary transition-colors">
+<span class="material-symbols-outlined text-headline-sm" data-icon="add_box">add_box</span>
+</div>
+<span class="font-headline-sm text-xs font-semibold text-primary">+ Új Kampánytípus / Csatorna</span>
+<span class="text-[10px] text-outline">Pl. OOH Óriásplakát, TikTok, Hírlevél</span>
+</button>
+</div>
+</div>
+<!-- 3. DEDIKÁLT CSOPORT-SPECIFIKUS VEZÉRLŐ & KPI PULT (Facebook & Social) -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-5 space-y-4">
+<!-- Group Title Bar with Contextual Actions -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-outline-variant">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[24px]" data-icon="share">share</span>
+</div>
+<div>
+<div class="flex items-center gap-2.5 flex-wrap">
+<h2 class="text-headline-md font-headline-md text-on-surface font-bold">Facebook &amp; Social Dedikált Munkatér</h2>
+<span class="px-2.5 py-0.5 rounded bg-primary-fixed text-primary font-mono text-xs font-semibold">csatorna-kód: social-meta</span>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-error text-xs font-semibold flex items-center gap-1 border border-error/20">
+<span class="material-symbols-outlined text-[14px]" data-icon="warning">warning</span> 1 Blokkoló hiba
+          </span>
+</div>
+<p class="font-body-sm text-xs text-outline mt-0.5">Meta hirdetéskezelőhöz szabott automata ellenőrzések, képarány-vizsgálat és AP-kód egyeztetés.</p>
+</div>
+</div>
+<!-- Group Dedicated Action Buttons -->
+<div class="flex items-center gap-2.5 flex-wrap shrink-0">
+<button class="px-3.5 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-xs font-semibold transition-colors flex items-center gap-1.5 border border-outline-variant shadow-sm">
+<span class="material-symbols-outlined text-[17px] text-primary" data-icon="cloud_upload">cloud_upload</span>
+<span>Social kreatívok tömeges feltöltése</span>
+</button>
+<button class="px-4 py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-md text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+<span>+ Új Social anyag hozzáadása</span>
+</button>
+</div>
+</div>
+<!-- 3 Dedicated Group KPI & Parameter Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+<!-- Card 1: Social Specifikus Készültség -->
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant/70 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-xs uppercase tracking-wider text-secondary font-bold">Social Post Készültség</span>
+<div class="w-7 h-7 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-headline-sm" data-icon="visibility">visibility</span>
+</div>
+</div>
+<div class="my-2">
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg-mobile font-display-lg text-on-surface font-bold">5 / 6</span>
+<span class="font-label-md text-xs text-secondary font-semibold">83% Elkészült</span>
+</div>
+<p class="text-body-sm text-xs text-outline mt-1 leading-normal">1 hiányzó vagy módosításra szoruló kreatív a publikáláshoz.</p>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 83%"></div>
+</div>
+</div>
+<!-- Card 2: Social Szabályok & Formátumok -->
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant/70 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-xs uppercase tracking-wider text-primary font-bold">Social Szabályzat &amp; Formátumok</span>
+<div class="w-7 h-7 rounded-full bg-primary-fixed text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-headline-sm" data-icon="rule">rule</span>
+</div>
+</div>
+<div class="my-2 space-y-1.5 text-xs">
+<div class="flex items-center justify-between text-outline">
+<span>Képarányok:</span>
+<span class="font-semibold text-on-surface">1:1 (Négyzetes) &amp; 9:16 (Vertikális)</span>
+</div>
+<div class="flex items-center justify-between text-outline">
+<span>Szövegarány küszöb:</span>
+<span class="font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">&lt; 20% képszöveg</span>
+</div>
+<div class="flex items-center justify-between text-outline">
+<span>Kötelező kód:</span>
+<span class="font-mono font-semibold text-primary bg-primary-fixed px-1.5 py-0.5 rounded">AP-kód látható</span>
+</div>
+</div>
+<div class="text-[11px] text-primary flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-[13px]" data-icon="verified">verified</span>
+<span>Meta Ads Policy 2025 szabvány aktiválva</span>
+</div>
+</div>
+<!-- Card 3: Célközönség & Időzítés -->
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant/70 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-xs uppercase tracking-wider text-tertiary font-bold">Célközönség &amp; Időzítés</span>
+<div class="w-7 h-7 rounded-full bg-tertiary-fixed text-tertiary flex items-center justify-center">
+<span class="material-symbols-outlined text-headline-sm" data-icon="schedule">schedule</span>
+</div>
+</div>
+<div class="my-2 space-y-1.5 text-xs">
+<div class="flex items-center justify-between text-outline">
+<span>Célcsoport:</span>
+<span class="font-semibold text-on-surface">18–39 év, Fesztivál &amp; Zene érdeklődés</span>
+</div>
+<div class="flex items-center justify-between text-outline">
+<span>Futási időszak:</span>
+<span class="font-mono font-semibold text-on-surface">2025.06.01 - 2025.07.15</span>
+</div>
+<div class="flex items-center justify-between text-outline">
+<span>Csatolt URL link:</span>
+<span class="font-mono text-outline truncate max-w-[170px]">spar.hu/fesztival2025</span>
+</div>
+</div>
+<div class="text-[11px] text-tertiary flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-[13px]" data-icon="campaign">campaign</span>
+<span>Központi kampányköltségkeret: Élesítés jóváhagyásra vár</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 4. DEDIKÁLT KREATÍV ANYAGMÁTRIX TÁBLÁZAT (TELJES SZÉLESSÉGBEN, KÉNYELMES MARGÓKKAL) -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden w-full">
+<!-- Table Filter & Search Controls Toolbar -->
+<div class="p-4 bg-surface-container-low border-b border-outline-variant flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-sm font-semibold text-on-surface">Facebook &amp; Social Csoport Anyagmátrixa</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-mono text-xs font-semibold">6 tétel</span>
+</div>
+<div class="flex items-center gap-2.5">
+<div class="relative w-full sm:w-72">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-outline">
+<span class="material-symbols-outlined text-body-md" data-icon="search">search</span>
+</span>
+<input class="w-full pl-9 pr-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-sm text-xs text-on-surface placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Keresés anyagnévre, AP-kódra, feliratra..." type="text"/>
+</div>
+<button class="px-3 py-1.5 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-md text-xs font-medium transition-colors flex items-center gap-1.5 shrink-0">
+<span class="material-symbols-outlined text-[16px] text-outline" data-icon="filter_list">filter_list</span>
+<span>Szűrők</span>
+</button>
+</div>
+</div>
+<!-- Full Width Robust Table -->
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse table-auto">
+<thead>
+<tr class="bg-surface border-b border-outline-variant text-on-surface font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-3 px-4 w-12 text-center font-bold">#</th>
+<th class="py-3 px-5 min-w-[240px] font-bold">Várt Anyag &amp; Formátum</th>
+<th class="py-3 px-5 min-w-[230px] font-bold">Kért Képi Szöveg</th>
+<th class="py-3 px-5 min-w-[260px] font-bold">Posztszöveg &amp; CTA</th>
+<th class="py-3 px-5 min-w-[220px] font-bold">Csatolt Kreatív</th>
+<th class="py-3 px-5 min-w-[230px] font-bold">Audit Státusz &amp; Riport</th>
+<th class="py-3 px-4 min-w-[140px] text-right font-bold">Műveletek</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/50 font-body-sm text-body-sm">
+<!-- Row 1: HIBA -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group">
+<td class="py-4 px-4 text-center text-outline font-medium">01</td>
+<td class="py-4 px-5">
+<div class="font-headline-sm text-sm text-on-surface font-semibold leading-snug">FB Feed Poszt #1 - Nyereményjáték beharangozó</div>
+<div class="flex items-center gap-2 text-outline text-xs mt-1.5 flex-wrap">
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono text-[11px]">1080 × 1080 px (1:1)</span>
+<span>•</span>
+<span class="font-mono text-outline">FB_01_FEED_SQ</span>
+</div>
+</td>
+<td class="py-4 px-5">
+<div class="p-2.5 bg-surface-container-low rounded-lg border border-outline-variant text-on-surface text-xs font-medium leading-relaxed shadow-sm">
+              "Nyerj napi 100.000 Ft-ot a fesztiválra!"
+            </div>
+<span class="text-xs text-error font-medium mt-1.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="error">error</span>
+              AP-kód kötelező hozzáadása
+            </span>
+</td>
+<td class="py-4 px-5">
+<p class="text-on-surface-variant text-xs leading-relaxed bg-surface-container-lowest p-2 rounded border border-outline-variant/30">
+              "Vásárolj legalább 2 promóciós terméket bármely SPAR szupermarketben és töltsd fel a blokkot a weboldalra! 🥤⛺"
+            </p>
+<div class="mt-1 text-[11px] text-primary font-medium">CTA: [Töltsd fel a blokkot]</div>
+</td>
+<td class="py-4 px-5">
+<div class="flex items-center gap-3">
+<div class="w-14 h-14 rounded-lg border border-outline-variant bg-surface-container overflow-hidden relative group/thumb cursor-pointer shadow-sm shrink-0">
+<img class="w-full h-full object-cover" data-alt="A brightly lit advertising banner design for a summer music festival on a clean royal blue and coral background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8E7eUGKbIW_32g0lAmE2Qq0N2w75FTsKodemHQBazppgs7afE9qVgIj825AWb0ehO1OMSHw4SYK-faWmTafj7G0YR4I1SSot62Et46Xx2ywc3bA_q03y7vgz_mbL92EYJMQoYkoXJ_KUfnPU4KMQkjE9SIjq83XzZaYYxXxb1-g-hpNnJHX8V87_dk3DMpWttTAo1xQDu8Z2fMgFaPar6TTiKonemFTTVNTSaDa1Env294dNs2EX5"/>
+<div class="absolute inset-0 bg-inverse-surface/40 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-inverse-on-surface text-body-md" data-icon="zoom_in">zoom_in</span>
+</div>
+</div>
+<div class="text-xs min-w-0">
+<span class="font-medium text-on-surface block truncate max-w-[150px]">spar_fest_sq1.png</span>
+<span class="text-outline block text-[11px] mt-0.5">1.2 MB · PNG</span>
+<span class="text-primary hover:underline text-[11px] cursor-pointer inline-flex items-center gap-0.5 mt-0.5">
+<span class="material-symbols-outlined text-[12px]" data-icon="visibility">visibility</span> Előnézet
+                </span>
+</div>
+</div>
+</td>
+<td class="py-4 px-5">
+<div class="space-y-1.5">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold leading-tight bg-error-container text-error border border-error/30 shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="cancel">cancel</span>
+<span>HIBA: AP-kód hiányzik</span>
+</div>
+<div class="text-outline text-xs pl-0.5">
+                1 észlelt blokkoló eltérés az OCR vizsgálaton
+              </div>
+</div>
+</td>
+<td class="py-4 px-4 text-right">
+<div class="flex items-center justify-end gap-1.5">
+<button class="px-2.5 py-1.5 rounded-lg border border-primary/30 hover:bg-primary/10 text-primary font-label-sm text-xs font-semibold transition-colors flex items-center gap-1 shrink-0" title="Részletes hiba és audit riport">
+<span>Riport</span>
+<span class="material-symbols-outlined text-xs" data-icon="open_in_new">open_in_new</span>
+</button>
+<button class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors shrink-0" title="Újra-audit indítása">
+<span class="material-symbols-outlined text-headline-sm" data-icon="refresh">refresh</span>
+</button>
+<button class="p-1.5 rounded-lg hover:bg-surface-container text-outline hover:text-on-surface transition-colors shrink-0" title="Egyéb műveletek">
+<span class="material-symbols-outlined text-headline-sm" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2: MEGFELELT -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group">
+<td class="py-4 px-4 text-center text-outline font-medium">02</td>
+<td class="py-4 px-5">
+<div class="font-headline-sm text-sm text-on-surface font-semibold leading-snug">Instagram Story Vertikális Animáció #2</div>
+<div class="flex items-center gap-2 text-outline text-xs mt-1.5 flex-wrap">
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono text-[11px]">1080 × 1920 px (9:16)</span>
+<span>•</span>
+<span class="font-mono text-outline">IG_STORY_02_V</span>
+</div>
+</td>
+<td class="py-4 px-5">
+<div class="p-2.5 bg-surface-container-low rounded-lg border border-outline-variant text-on-surface text-xs font-medium leading-relaxed shadow-sm">
+              "Kattints és töltsd fel a blokkot!"
+            </div>
+<span class="text-xs text-outline mt-1.5 block">Kötelező Swipe-Up CTA gomb &amp; Matrica</span>
+</td>
+<td class="py-4 px-5">
+<p class="text-on-surface-variant text-xs italic leading-relaxed bg-surface-container-lowest p-2 rounded border border-outline-variant/30">
+              (Story formátum: csak képi felirat és beépített interaktív matrica link)
+            </p>
+<div class="mt-1 text-[11px] text-primary font-medium">Link: spar.hu/fesztival2025</div>
+</td>
+<td class="py-4 px-5">
+<div class="flex items-center gap-3">
+<div class="w-14 h-14 rounded-lg border border-outline-variant bg-surface-container overflow-hidden relative group/thumb cursor-pointer shadow-sm shrink-0">
+<img class="w-full h-full object-cover" data-alt="A vertical format story creative for social media with bright yellow and vivid royal blue gradients." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6eoUPFeveNOk_xixCJfnj2kclNZ4Ny-2EaDkb0JJ9aV4SN4mUhfeX6ge2aKQieYmQ0lPS1n_ocIPhFX1KHnp4cFWOQP7GzPF27D6bTCG3sL_lGdYsy4OZt-uCxQc9TPux80QffaYWgpIPqx6ZjTsdKOmPCfg0kClKjvBwBK7nBWNsdQG4n0gwZ8gHwJE55yDxP6lCbIttOURX0Fy4OwXdsmVFcHyR7Qqwv4S1PAE3bzQNH8y9fxpe"/>
+<div class="absolute inset-0 bg-inverse-surface/40 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-inverse-on-surface text-body-md" data-icon="play_circle">play_circle</span>
+</div>
+</div>
+<div class="text-xs min-w-0">
+<span class="font-medium text-on-surface block truncate max-w-[150px]">fest_story_v2.mp4</span>
+<span class="text-outline block text-[11px] mt-0.5">4.8 MB · MP4 (9s)</span>
+<span class="text-primary hover:underline text-[11px] cursor-pointer inline-flex items-center gap-0.5 mt-0.5">
+<span class="material-symbols-outlined text-[12px]" data-icon="play_arrow">play_arrow</span> Lejátszás
+                </span>
+</div>
+</div>
+</td>
+<td class="py-4 px-5">
+<div class="space-y-1.5">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold leading-tight bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="check_circle">check_circle</span>
+<span>MEGFELELT: 100% Szabályos</span>
+</div>
+<div class="text-emerald-700/80 text-xs pl-0.5 font-medium">
+                Minden képarány és safe zone érvényesítve
+              </div>
+</div>
+</td>
+<td class="py-4 px-4 text-right">
+<div class="flex items-center justify-end gap-1.5">
+<button class="px-2.5 py-1.5 rounded-lg border border-primary/30 hover:bg-primary/10 text-primary font-label-sm text-xs font-semibold transition-colors flex items-center gap-1 shrink-0" title="Részletes audit riport">
+<span>Riport</span>
+<span class="material-symbols-outlined text-xs" data-icon="open_in_new">open_in_new</span>
+</button>
+<button class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors shrink-0" title="Újra-audit indítása">
+<span class="material-symbols-outlined text-headline-sm" data-icon="refresh">refresh</span>
+</button>
+<button class="p-1.5 rounded-lg hover:bg-surface-container text-outline hover:text-on-surface transition-colors shrink-0" title="Egyéb műveletek">
+<span class="material-symbols-outlined text-headline-sm" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Meta Reels Videó (3. Anyag a csoportban) -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group">
+<td class="py-4 px-4 text-center text-outline font-medium">03</td>
+<td class="py-4 px-5">
+<div class="font-headline-sm text-sm text-on-surface font-semibold leading-snug">Facebook &amp; Instagram Reels Promó</div>
+<div class="flex items-center gap-2 text-outline text-xs mt-1.5 flex-wrap">
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono text-[11px]">1080 × 1920 px (9:16)</span>
+<span>•</span>
+<span class="font-mono text-outline">META_REELS_FEST</span>
+</div>
+</td>
+<td class="py-4 px-5">
+<div class="p-2.5 bg-surface-container-low rounded-lg border border-outline-variant text-on-surface text-xs font-medium leading-relaxed shadow-sm">
+              "Fesztiválozz a SPAR-ral és nyerj Toyota Yaris Hybridet!"
+            </div>
+<span class="text-xs text-outline mt-1.5 block">Feliratok (CC) beágyazása elvárt</span>
+</td>
+<td class="py-4 px-5">
+<p class="text-on-surface-variant text-xs leading-relaxed bg-surface-container-lowest p-2 rounded border border-outline-variant/30">
+              "Te készen állsz az idei nyár legnagyobb bulijára? Töltsd fel a blokkod még ma! 🚗🎉"
+            </p>
+<div class="mt-1 text-[11px] text-primary font-medium">CTA: [Részletek a bióban]</div>
+</td>
+<td class="py-4 px-5">
+<div class="flex items-center gap-3">
+<div class="w-14 h-14 rounded-lg border border-dashed border-outline-variant bg-surface-container-low flex flex-col items-center justify-center text-outline shrink-0">
+<span class="material-symbols-outlined text-body-md" data-icon="videocam">videocam</span>
+<span class="text-[9px] mt-0.5">MP4 várt</span>
+</div>
+<div class="text-xs min-w-0">
+<span class="font-medium text-outline block">reels_v1_draft.mp4</span>
+<span class="text-outline block text-[11px] mt-0.5">Elővizsgálat alatt</span>
+<span class="text-primary hover:underline text-[11px] cursor-pointer inline-flex items-center gap-0.5 mt-0.5">
+<span class="material-symbols-outlined text-[12px]" data-icon="upload">upload</span> Feltöltés csere
+                </span>
+</div>
+</div>
+</td>
+<td class="py-4 px-5">
+<div class="space-y-1.5">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold leading-tight bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="check_circle">check_circle</span>
+<span>MEGFELELT: Safe Zone OK</span>
+</div>
+<div class="text-emerald-700/80 text-xs pl-0.5 font-medium">
+                Mobil UI kitakarás kizárva
+              </div>
+</div>
+</td>
+<td class="py-4 px-4 text-right">
+<div class="flex items-center justify-end gap-1.5">
+<button class="px-2.5 py-1.5 rounded-lg border border-primary/30 hover:bg-primary/10 text-primary font-label-sm text-xs font-semibold transition-colors flex items-center gap-1 shrink-0" title="Részletes audit riport">
+<span>Riport</span>
+<span class="material-symbols-outlined text-xs" data-icon="open_in_new">open_in_new</span>
+</button>
+<button class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors shrink-0" title="Újra-audit indítása">
+<span class="material-symbols-outlined text-headline-sm" data-icon="refresh">refresh</span>
+</button>
+<button class="p-1.5 rounded-lg hover:bg-surface-container text-outline hover:text-on-surface transition-colors shrink-0" title="Egyéb műveletek">
+<span class="material-symbols-outlined text-headline-sm" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 5. CSOPORT-SPECIFIKUS ELLENŐRZŐ LISTA (DEDIKÁLTAN A SOCIAL CSATORNÁHOZ) -->
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant shadow-sm w-full">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-outline-variant gap-2">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary text-headline-sm" data-icon="checklist">checklist</span>
+<h3 class="font-headline-sm text-base text-on-surface font-semibold">Social Munkatér Dedikált Ellenőrző Lista &amp; QA</h3>
+</div>
+<span class="font-label-sm text-xs font-semibold px-2.5 py-1 rounded-full bg-surface-container text-primary">4 / 5 Feltétel Teljesítve ezen a csatornán</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-4 text-xs">
+<label class="flex items-center gap-3 p-3 rounded-lg bg-surface-container-low border border-outline-variant/40 cursor-pointer hover:bg-surface-container transition-colors">
+<input checked="" class="rounded text-primary focus:ring-primary w-4 h-4 border-outline shrink-0" type="checkbox"/>
+<div>
+<span class="font-medium text-on-surface block">Mobil Safe Zone ellenőrzés (9:16 Stories &amp; Reels)</span>
+<span class="text-[11px] text-outline">A gombok és feliratok nem takarják ki a márkajelzést</span>
+</div>
+</label>
+<label class="flex items-center gap-3 p-3 rounded-lg bg-surface-container-low border border-outline-variant/40 cursor-pointer hover:bg-surface-container transition-colors">
+<input checked="" class="rounded text-primary focus:ring-primary w-4 h-4 border-outline shrink-0" type="checkbox"/>
+<div>
+<span class="font-medium text-on-surface block">Kattintható link &amp; UTM paraméterezés tesztelése</span>
+<span class="text-[11px] text-outline">utm_source=meta&amp;utm_campaign=fest25 érvényes</span>
+</div>
+</label>
+<label class="flex items-center gap-3 p-3 rounded-lg bg-surface-container-low border border-outline-variant/40 cursor-pointer hover:bg-surface-container transition-colors">
+<input checked="" class="rounded text-primary focus:ring-primary w-4 h-4 border-outline shrink-0" type="checkbox"/>
+<div>
+<span class="font-medium text-on-surface block">Hang nélküli felirat &amp; akadálymentesítés</span>
+<span class="text-[11px] text-outline">Auto-captions és képszöveg kontrasztarány megfelelő</span>
+</div>
+</label>
+<label class="flex items-center gap-3 p-3 rounded-lg bg-error-container/30 border border-error/30 cursor-pointer hover:bg-error-container/40 transition-colors">
+<input class="rounded text-error focus:ring-error w-4 h-4 border-error shrink-0" type="checkbox"/>
+<div>
+<span class="font-semibold text-error block">AP kód megléte az összes Facebook &amp; Instagram képen</span>
+<span class="text-[11px] text-error/80">FB_01_FEED_SQ képen nem található AP-kód</span>
+</div>
+</label>
+<label class="flex items-center gap-3 p-3 rounded-lg bg-surface-container-low border border-outline-variant/40 cursor-pointer hover:bg-surface-container transition-colors">
+<input checked="" class="rounded text-primary focus:ring-primary w-4 h-4 border-outline shrink-0" type="checkbox"/>
+<div>
+<span class="font-medium text-on-surface block">Meta 20% szövegfedési szabály betartása</span>
+<span class="text-[11px] text-outline">Minden feltöltött kreatív &lt; 14% fedettségű</span>
+</div>
+</label>
+<div class="p-3 rounded-lg border border-dashed border-outline-variant flex items-center justify-between bg-surface-container-low/50">
+<div>
+<span class="font-medium text-on-surface block text-xs">Új QA szabály hozzáadása</span>
+<span class="text-[11px] text-outline">Csak a Social csoportra alkalmazva</span>
+</div>
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-highest text-primary font-semibold text-xs transition-colors">
+        + Szabály
+      </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

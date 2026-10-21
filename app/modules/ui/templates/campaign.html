@@ -31,13 +31,13 @@
 
     <!-- Primary Workspace View Switcher (Tabs) -->
     <div class="flex items-center bg-surface-container-low p-1.5 rounded-xl border border-outline-variant overflow-x-auto gap-1 self-start xl:self-center shrink-0 max-w-full" role="tablist">
-      <button class="tab-btn active px-4 py-2 rounded-lg font-label-md text-label-md bg-surface-container-lowest text-primary font-semibold shadow-sm whitespace-nowrap cursor-pointer hover:text-primary" data-target="overview" onclick="openTab(event, 'overview'); updateTabStyles(this)">
+      <button class="tab-btn active px-4 py-2 rounded-lg font-label-md text-label-md bg-surface-container-lowest text-primary font-semibold shadow-sm whitespace-nowrap cursor-pointer hover:text-primary" data-target="overview" onclick="switchCampaignTab('overview', this)">
         Áttekintés
       </button>
-      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-label-md text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer" data-target="creatives" onclick="openTab(event, 'creatives'); updateTabStyles(this)">
+      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-label-md text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer" data-target="creatives" onclick="switchCampaignTab('creatives', this)">
         Kreatívok & Referenciák
       </button>
-      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-label-md text-outline hover:text-on-surface transition-colors whitespace-nowrap flex items-center gap-2 cursor-pointer" data-target="issues" onclick="openTab(event, 'issues'); updateTabStyles(this)">
+      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-label-md text-outline hover:text-on-surface transition-colors whitespace-nowrap flex items-center gap-2 cursor-pointer" data-target="issues" onclick="switchCampaignTab('issues', this)">
         <span>Hibák & Ellenőrzés</span>
         {% if open_issues|length > 0 %}
           <span class="w-5 h-5 rounded-full bg-secondary text-on-secondary text-[11px] flex items-center justify-center font-bold">{{ open_issues|length }}</span>
@@ -47,27 +47,58 @@
   </div>
 
 <script>
+  const tabSectionMap = {
+    assets: 'creatives',
+    references: 'creatives',
+    channels: 'overview',
+    facts: 'overview',
+    rules: 'overview',
+    issues: 'issues',
+    checklist: 'issues'
+  };
+
   function updateTabStyles(clickedBtn) {
-    // Reset all tabs to inactive styles
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.classList.remove('bg-surface-container-lowest', 'text-primary', 'font-semibold', 'shadow-sm');
       btn.classList.add('text-outline');
     });
-    // Add active styles to clicked tab
-    clickedBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'font-semibold', 'shadow-sm');
-    clickedBtn.classList.remove('text-outline');
+    if (clickedBtn) {
+      clickedBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'font-semibold', 'shadow-sm');
+      clickedBtn.classList.remove('text-outline');
+    }
   }
 
-  // Hook into the existing openTab function on load to style the correct initial tab
+  function switchCampaignTab(tabId, clickedBtn) {
+    const effectiveTab = tabSectionMap[tabId] || tabId;
+    const targetPane = document.getElementById(effectiveTab);
+    const targetBtn = clickedBtn || document.querySelector(`.tab-btn[data-target="${effectiveTab}"]`);
+
+    if (targetPane) {
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      targetPane.classList.add('active');
+    }
+    if (targetBtn) {
+      updateTabStyles(targetBtn);
+    }
+    if (history.pushState) {
+      history.pushState(null, null, '#' + tabId);
+    }
+    if (tabId !== effectiveTab) {
+      const innerEl = document.getElementById(tabId);
+      if (innerEl) {
+        setTimeout(() => innerEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+      }
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     const hash = window.location.hash.substring(1);
-    let targetBtn = document.querySelector(`.tab-btn[data-target="${hash}"]`);
-    if(!targetBtn) {
-       targetBtn = document.querySelector('.tab-btn');
-    }
-    if(targetBtn) {
-       updateTabStyles(targetBtn);
-    }
+    switchCampaignTab(hash || 'overview');
+  });
+
+  window.addEventListener("hashchange", () => {
+    const hash = window.location.hash.substring(1);
+    switchCampaignTab(hash || 'overview');
   });
 </script>
 
@@ -77,12 +108,12 @@
   {% include "_channels.html" %}
 </div>
 
-<div id="creatives" class="tab-pane">
+<div id="creatives" class="tab-pane space-y-6 mt-6">
   {% include "_assets.html" %}
   {% include "_references.html" %}
 </div>
 
-<div id="issues" class="tab-pane">
+<div id="issues" class="tab-pane space-y-6 mt-6">
   {% include "_issues.html" %}
   {% include "_checklist.html" %}
 </div>
