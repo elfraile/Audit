@@ -142,3 +142,111 @@ def test_channel_specific_rules_and_copy_check(db, setup_campaign_channels):
     assert not any("raklap" in t for t in result_titles)
     # A Deliverable-höz rendelt elvárt képi tartalom is lefutott és sikeres
     assert any("Várt tartalom" in t or "Kért képi tartalom" in t for t in result_titles)
+
+
+def test_channel_workspace_ui_and_direct_slot_upload(admin, db, setup_campaign_channels):
+    from io import BytesIO
+    from app.modules.factsheet import service as fact_service
+
+    client, campaign, user, ch_social, ch_pos, deliv_fb1, deliv_pos1 = setup_campaign_channels
+    fact_service.set_fact(db, campaign.id, "promocio_idoszak", "2026. nov 1-30.", "brief", None, user.id)
+    fact_service.set_fact(db, campaign.id, "fodij", "100.000 Ft utalvány", "brief", None, user.id)
+
+    # 1. Kampány főoldal lekérése: csatorna kártyák és tényadat sáv megjelenése
+    resp_camp = admin.get(f"/campaigns/{campaign.id}")
+    assert resp_camp.status_code == 200
+    html_camp = resp_camp.text
+    assert "Facebook / Social" in html_camp
+    assert "Munkatér megnyitása" in html_camp
+    assert "2026. nov 1-30." in html_camp
+    assert "100.000 Ft utalvány" in html_camp
+
+    # 2. Egyedi csatorna munkatér lekérése (Facebook csatorna)
+    resp_ch = admin.get(f"/campaigns/{campaign.id}/channels/{ch_social.id}")
+    assert resp_ch.status_code == 200
+    html_ch = resp_ch.text
+    assert "FB Poszt #1 (Bejelentő)" in html_ch
+    assert "Feltöltés &amp; Auditálás" in html_ch or "Feltöltés & Auditálás" in html_ch
+    assert "Vásárolj 2 db terméket és nyerj!" in html_ch
+
+    # 3. Közvetlen slot feltöltés erre a deliverable-re
+    import fitz
+    doc = fitz.open()
+    page = doc.new_page(width=500, height=300)
+    page.insert_text((50, 50), "Podravka promóció FB poszt")
+    file_content = doc.write()
+    doc.close()
+
+    upload_resp = admin.post(
+        f"/campaigns/{campaign.id}/deliverables/{deliv_fb1.id}/upload",
+        files={"file": ("FB_01_Ad.pdf", file_content, "application/pdf")},
+        follow_redirects=True,
+    )
+    assert upload_resp.status_code == 200
+
+    db.refresh(deliv_fb1)
+    assert deliv_fb1.asset_id is not None
+
+    asset = db.get(Asset, deliv_fb1.asset_id)
+    assert asset is not None
+    assert asset.channel_id == ch_social.id
+    assert asset.deliverable_id == deliv_fb1.id
+
+    # Automatikusan lefutott az audit
+    last_run = audit_service.latest_run_for_asset(db, asset.id)
+    assert last_run is not None
+
+    # 4. Leválasztás (unlink) tesztelése
+    unlink_resp = admin.post(
+        f"/campaigns/{campaign.id}/deliverables/{deliv_fb1.id}/unlink",
+        follow_redirects=True,
+    )
+    assert unlink_resp.status_code == 200
+    db.refresh(deliv_fb1)
+    assert deliv_fb1.asset_id is None
+
+
+def test_channel_deliverable_crud_and_rulebook_explorer(admin, db, setup_campaign_channels):
+    client, campaign, user, ch_social, ch_pos, deliv_fb1, deliv_pos1 = setup_campaign_channels
+
+    # 1. Új várt anyag létrehozása csatornában
+    create_resp = admin.post(
+        f"/campaigns/{campaign.id}/channels/{ch_social.id}/deliverables",
+        data={
+            "name": "FB Sztori #1 (Új)",
+            "specs": "1080x1920",
+            "expected_copy": "Kattints a linkre!",
+            "post_copy": "Sztori leírás",
+            "file_pattern": "FB_Story*",
+        },
+        follow_redirects=True,
+    )
+    assert create_resp.status_code == 200
+
+    new_deliv = db.scalar(
+        channel_service.select(channel_service.Deliverable).where(
+            channel_service.Deliverable.channel_id == ch_social.id,
+            channel_service.Deliverable.name == "FB Sztori #1 (Új)",
+        )
+    )
+    assert new_deliv is not None
+    assert new_deliv.specs == "1080x1920"
+    new_deliv_id = new_deliv.id
+
+    # 2. Várt anyag törlése
+    del_resp = admin.post(
+        f"/campaigns/{campaign.id}/channels/{ch_social.id}/deliverables/{new_deliv_id}/delete",
+        follow_redirects=True,
+    )
+    assert del_resp.status_code == 200
+    db.expire_all()
+    assert db.get(channel_service.Deliverable, new_deliv_id) is None
+
+    # 3. Szabálykönyv explorer ellenőrzése a kampányoldalon
+    camp_resp = admin.get(f"/campaigns/{campaign.id}#rules")
+    assert camp_resp.status_code == 200
+    assert "Szabálykönyv &amp; Compliance Explorer" in camp_resp.text or "Szabálykönyv & Compliance Explorer" in camp_resp.text
+    assert "Ügyfélszintű Brandbook" in camp_resp.text
+    assert "Csatorna-specifikus" in camp_resp.text
+
+

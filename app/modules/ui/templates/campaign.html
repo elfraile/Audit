@@ -1,69 +1,66 @@
 {% extends "base.html" %}
-{% block title %}{{ campaign.name }}{% endblock %}
+{% block title %}{{ campaign.name }} | Compliance Hub{% endblock %}
 {% block content %}
 <div class="w-full space-y-6">
 
-  <!-- 1. CAMPAIGN HEADER -->
-  <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-surface-container-lowest p-space-lg rounded-xl border border-outline-variant shadow-sm">
-    <div class="space-y-1">
-      <div class="flex items-center gap-2 flex-wrap">
-        <span class="text-outline text-body-sm"><a href="/" class="hover:text-on-surface">Ügyfelek</a></span>
-        <span class="text-outline text-body-sm">•</span>
-        <span class="font-body-sm text-body-sm text-outline">{{ client.name }}</span>
-      </div>
-      <h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight">{{ campaign.name }}</h1>
-      {% if delivery %}
-        <div class="mt-2">
-          {% if delivery.ready %}
-            <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-label-md border border-emerald-200 shadow-sm inline-flex items-center gap-1">
-              <span class="material-symbols-outlined text-[16px]">check_circle</span>
-              LEADÁSRA KÉSZ (Minden tétel lezárva)
-            </span>
-          {% else %}
-            <span class="px-2 py-0.5 rounded-full bg-error-container text-error font-label-md border border-error/20 shadow-sm inline-flex items-center gap-1">
-              <span class="material-symbols-outlined text-[14px]">warning</span>
-              Leadás függőben: {{ delivery.open_issues }} nyitott hiba · {{ delivery.failed_assets }} audit hiba · {{ delivery.pending_checklist }} pipa hiányzik
-            </span>
-          {% endif %}
-        </div>
-      {% endif %}
+  <!-- 1. MINDIG ELÉRHETŐ KAMPÁNY FACTSHEET SÁV (RIBBON) -->
+  {% include "_factsheet_ribbon.html" %}
+
+  <!-- 2. KAMPÁNY VEZÉRLŐPULT FEJLÉC ÉS NÉZETVÁLTÓ (TABS) -->
+  <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-surface-container-lowest p-4 rounded-xl border border-outline-variant shadow-sm">
+    <div>
+      <h1 class="text-xl font-bold text-on-surface tracking-tight m-0">{{ campaign.name }}</h1>
+      <p class="text-xs text-outline mt-0.5">Ügyfél: <strong class="text-on-surface">{{ client.name }}</strong></p>
     </div>
 
     <!-- Primary Workspace View Switcher (Tabs) -->
     <div class="flex items-center bg-surface-container-low p-1.5 rounded-xl border border-outline-variant overflow-x-auto gap-1 self-start xl:self-center shrink-0 max-w-full" role="tablist">
-      <button class="tab-btn active px-4 py-2 rounded-lg font-label-md text-label-md bg-surface-container-lowest text-primary font-semibold shadow-sm whitespace-nowrap cursor-pointer hover:text-primary" data-target="overview" onclick="switchCampaignTab('overview', this)">
-        Áttekintés
+      <button class="tab-btn active px-4 py-2 rounded-lg font-label-md text-xs bg-surface-container-lowest text-primary font-bold shadow-sm whitespace-nowrap cursor-pointer hover:text-primary flex items-center gap-1.5" data-target="channels" onclick="switchCampaignTab('channels', this)">
+        <span class="material-symbols-outlined text-[18px]">dashboard_customize</span>
+        <span>Csatornák (Munkaterek)</span>
       </button>
-      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-label-md text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer" data-target="creatives" onclick="switchCampaignTab('creatives', this)">
-        Kreatívok & Referenciák
+      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5" data-target="rules" onclick="switchCampaignTab('rules', this)">
+        <span class="material-symbols-outlined text-[18px]">gavel</span>
+        <span>Szabálykönyv</span>
       </button>
-      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-label-md text-outline hover:text-on-surface transition-colors whitespace-nowrap flex items-center gap-2 cursor-pointer" data-target="issues" onclick="switchCampaignTab('issues', this)">
+      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5" data-target="creatives" onclick="switchCampaignTab('creatives', this)">
+        <span class="material-symbols-outlined text-[18px]">perm_media</span>
+        <span>Kreatívok & Fájlok</span>
+      </button>
+      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap flex items-center gap-1.5 cursor-pointer" data-target="issues" onclick="switchCampaignTab('issues', this)">
+        <span class="material-symbols-outlined text-[18px]">flag</span>
         <span>Hibák & Ellenőrzés</span>
         {% if open_issues|length > 0 %}
           <span class="w-5 h-5 rounded-full bg-secondary text-on-secondary text-[11px] flex items-center justify-center font-bold">{{ open_issues|length }}</span>
         {% endif %}
+      </button>
+      <button class="tab-btn px-4 py-2 rounded-lg font-label-md text-xs text-outline hover:text-on-surface transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5" data-target="facts" onclick="switchCampaignTab('facts', this)">
+        <span class="material-symbols-outlined text-[18px]">fact_check</span>
+        <span>Teljes Adatlap</span>
       </button>
     </div>
   </div>
 
 <script>
   const tabSectionMap = {
+    overview: 'channels',
+    channels: 'channels',
+    rules: 'rules',
+    creatives: 'creatives',
     assets: 'creatives',
     references: 'creatives',
-    channels: 'overview',
-    facts: 'overview',
-    rules: 'overview',
     issues: 'issues',
-    checklist: 'issues'
+    checklist: 'issues',
+    facts: 'facts'
   };
 
   function updateTabStyles(clickedBtn) {
     document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.classList.remove('bg-surface-container-lowest', 'text-primary', 'font-semibold', 'shadow-sm');
+      btn.classList.remove('bg-surface-container-lowest', 'text-primary', 'font-bold', 'shadow-sm');
       btn.classList.add('text-outline');
     });
     if (clickedBtn) {
-      clickedBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'font-semibold', 'shadow-sm');
+      clickedBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'font-bold', 'shadow-sm');
       clickedBtn.classList.remove('text-outline');
     }
   }
@@ -93,19 +90,22 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const hash = window.location.hash.substring(1);
-    switchCampaignTab(hash || 'overview');
+    switchCampaignTab(hash || 'channels');
   });
 
   window.addEventListener("hashchange", () => {
     const hash = window.location.hash.substring(1);
-    switchCampaignTab(hash || 'overview');
+    switchCampaignTab(hash || 'channels');
   });
 </script>
 
-<div id="overview" class="tab-pane active space-y-6 mt-6">
-  {% include "_facts.html" %}
-  {% include "_rules.html" %}
+<!-- TAB TARTALMAK -->
+<div id="channels" class="tab-pane active space-y-6 mt-6">
   {% include "_channels.html" %}
+</div>
+
+<div id="rules" class="tab-pane space-y-6 mt-6">
+  {% include "_rules.html" %}
 </div>
 
 <div id="creatives" class="tab-pane space-y-6 mt-6">
@@ -117,5 +117,10 @@
   {% include "_issues.html" %}
   {% include "_checklist.html" %}
 </div>
+
+<div id="facts" class="tab-pane space-y-6 mt-6">
+  {% include "_facts.html" %}
+</div>
+
 </div>
 {% endblock %}

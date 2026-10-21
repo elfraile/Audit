@@ -56,15 +56,28 @@ def campaign_page(campaign_id: int, request: Request, user: User = Depends(ui_us
     latest_run_by_asset = {a.id: run for a, run in assets_with_runs}
 
     channel_by_id = {c.id: c for c in channels}
+    channel_summaries = {c.id: channel_service.get_channel_summary(db, c.id, campaign_id) for c in channels}
+
+    facts = fact_queries.confirmed_facts(db, campaign_id)
+    facts_dict = {f.key: f.value for f in facts}
+
+    approved = rule_queries.active_rules(db, client.id, campaign_id)
+    client_rules = [r for r in approved if r.scope_type == "client"]
+    campaign_rules = [r for r in approved if r.scope_type == "campaign" and not (r.applies_to or {}).get("channel_id")]
+    channel_rules = [r for r in approved if r.scope_type == "channel" or bool((r.applies_to or {}).get("channel_id"))]
 
     return render(
         request, "campaign.html", user, campaign=campaign, client=client,
-        facts=fact_queries.confirmed_facts(db, campaign_id),
+        facts=facts,
+        facts_dict=facts_dict,
         questions=fact_queries.open_questions(db, campaign_id),
         proposals=fact_queries.proposals(db, campaign_id),
         drafts=(rule_queries.drafts(db, "campaign", campaign_id)
                 + rule_queries.drafts(db, "client", client.id)),
-        approved=rule_queries.active_rules(db, client.id, campaign_id),
+        approved=approved,
+        client_rules=client_rules,
+        campaign_rules=campaign_rules,
+        channel_rules=channel_rules,
         categories=ctx.categories.items(),
         open_issues=issue_queries.open_issues(db, campaign_id),
         closed_issues=issue_queries.closed_issues(db, campaign_id),
@@ -73,11 +86,13 @@ def campaign_page(campaign_id: int, request: Request, user: User = Depends(ui_us
         references=refs,
         channels=channels,
         channel_by_id=channel_by_id,
+        channel_summaries=channel_summaries,
         deliverables=deliverables,
         deliverables_by_channel=deliverables_by_channel,
         asset_by_id=asset_by_id,
         latest_run_by_asset=latest_run_by_asset,
         delivery=check_delivery_readiness(db, campaign_id),
+        can_edit=(user.role in EDIT_ROLES),
     )
 
 

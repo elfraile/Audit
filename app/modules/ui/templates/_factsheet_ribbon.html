@@ -1,0 +1,90 @@
+<!-- COMPACT FACTSHEET RIBBON (Mindig elérhető kampány alapadatok és leadási státusz) -->
+<div class="w-full bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-4 space-y-3">
+  <!-- Top line: Breadcrumb + Delivery Readiness Badge + Open Issues Count -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-outline-variant/40 pb-3">
+    <div class="flex items-center gap-2 flex-wrap">
+      <a href="/" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
+        <span class="material-symbols-outlined text-[16px]">domain</span> Ügyfelek
+      </a>
+      <span class="text-outline text-xs">/</span>
+      <span class="text-xs font-semibold text-on-surface">{{ client.name }}</span>
+      <span class="text-outline text-xs">/</span>
+      <a href="/campaigns/{{ campaign.id }}" class="text-xs font-bold text-on-surface hover:text-primary">
+        {{ campaign.name }}
+      </a>
+      {% if channel is defined and channel %}
+        <span class="text-outline text-xs">/</span>
+        <span class="px-2 py-0.5 rounded-md bg-primary-fixed text-primary font-mono text-xs font-bold flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">
+            {% if channel.code == 'social' %}share
+            {% elif channel.code == 'press' %}newspaper
+            {% elif channel.code == 'pos' %}storefront
+            {% elif channel.code == 'web' %}language
+            {% else %}folder{% endif %}
+          </span>
+          {{ channel.name }}
+        </span>
+      {% endif %}
+    </div>
+
+    <div class="flex items-center gap-2 flex-wrap">
+      {% if delivery %}
+        {% if delivery.ready %}
+          <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-label-md text-xs font-bold border border-emerald-200 shadow-sm inline-flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span>
+            LEADÁSRA KÉSZ
+          </span>
+        {% else %}
+          <span class="px-2.5 py-1 rounded-full bg-error-container text-error font-label-md text-xs font-bold border border-error/20 shadow-sm inline-flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">warning</span>
+            Leadás függőben:
+            {% if delivery.open_issues > 0 %} {{ delivery.open_issues }} hiba{% endif %}
+            {% if delivery.missing_deliverables > 0 %} · {{ delivery.missing_deliverables }} hiányzó anyag{% endif %}
+            {% if delivery.failed_assets > 0 %} · {{ delivery.failed_assets }} elbukott audit{% endif %}
+          </span>
+        {% endif %}
+      {% endif %}
+
+      <a href="/campaigns/{{ campaign.id }}#issues" class="px-2.5 py-1 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-xs font-semibold border border-outline-variant inline-flex items-center gap-1 transition-colors">
+        <span class="material-symbols-outlined text-[16px] text-error">flag</span>
+        <span>Hibák: <strong>{{ delivery.open_issues if delivery else 0 }}</strong></span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Key Factsheet Cards (Mindig látható legfontosabb kampányadatok) -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <!-- 1. Időszak -->
+    <div class="flex items-start gap-2.5 p-2.5 bg-surface-container-low rounded-lg border border-outline-variant/60">
+      <span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">calendar_month</span>
+      <div class="min-w-0">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-outline block">Promóció Időtartama</span>
+        <span class="text-xs font-semibold text-on-surface truncate block" title="{{ facts_dict.get('promocio_idoszak', 'Nincs rögzítve') }}">
+          {{ facts_dict.get('promocio_idoszak', 'Nincs rögzítve') }}
+        </span>
+      </div>
+    </div>
+
+    <!-- 2. Fődíj -->
+    <div class="flex items-start gap-2.5 p-2.5 bg-surface-container-low rounded-lg border border-outline-variant/60">
+      <span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">trophy</span>
+      <div class="min-w-0">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-outline block">Fődíj</span>
+        <span class="text-xs font-semibold text-on-surface truncate block" title="{{ facts_dict.get('fodij', 'Nincs rögzítve') }}">
+          {{ facts_dict.get('fodij', 'Nincs rögzítve') }}
+        </span>
+      </div>
+    </div>
+
+    <!-- 3. Mechanizmus -->
+    <div class="flex items-start gap-2.5 p-2.5 bg-surface-container-low rounded-lg border border-outline-variant/60">
+      <span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">receipt_long</span>
+      <div class="min-w-0">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-outline block">Vásárlási Feltétel / Mechanizmus</span>
+        <span class="text-xs font-semibold text-on-surface truncate block" title="{{ facts_dict.get('mechanizmus', 'Nincs rögzítve') }}">
+          {{ facts_dict.get('mechanizmus', 'Nincs rögzítve') }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

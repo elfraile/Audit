@@ -120,3 +120,90 @@ def auto_match_deliverables(db: Session, campaign_id: int) -> int:
     if matched_count > 0:
         db.commit()
     return matched_count
+
+
+def get_channel_summary(db: Session, channel_id: int, campaign_id: int) -> dict:
+    from app.modules.audits.models import FAILED, PASSED, AuditRun
+    from app.modules.issues.models import Issue, OPEN
+
+    deliverables = list_deliverables(db, campaign_id, channel_id)
+    total_delivs = len(deliverables)
+    assigned_delivs = len([d for d in deliverables if d.asset_id])
+    missing_delivs = total_delivs - assigned_delivs
+
+    channel_assets = list(db.scalars(
+        select(Asset).where(Asset.campaign_id == campaign_id, Asset.channel_id == channel_id)
+    ))
+
+    failed_count = 0
+    passed_count = 0
+    for a in channel_assets:
+        last_run = db.scalar(
+            select(AuditRun).where(AuditRun.asset_id == a.id).order_by(AuditRun.id.desc())
+        )
+        if last_run:
+            if last_run.status == FAILED:
+                failed_count += 1
+            elif last_run.status == PASSED:
+                passed_count += 1
+
+    asset_ids = {a.id for a in channel_assets}
+    open_issues = list(db.scalars(
+        select(Issue).where(
+            Issue.campaign_id == campaign_id,
+            Issue.status == OPEN,
+            Issue.asset_id.in_(asset_ids) if asset_ids else False
+        )
+    )) if asset_ids else []
+
+    status = "ready"
+    if failed_count > 0 or len(open_issues) > 0:
+        status = "failed"
+    elif missing_delivs > 0 or (total_delivs > 0 and assigned_delivs < total_delivs):
+        status = "pending"
+    elif total_delivs == 0:
+        status = "empty"
+
+    return {
+        "channel_id": channel_id,
+        "total": total_delivs,
+        "assigned": assigned_delivs,
+        "missing": missing_delivs,
+        "failed": failed_count,
+        "passed": passed_count,
+        "open_issues": len(open_issues),
+        "status": status,
+    }
+
+
+def upload_to_deliverable(db: Session, campaign_id: int, deliverable_id: int,
+                          filename: str, data: bytes, user_id: int | None = None):
+    from app.modules.assets.service import save_and_ingest
+    from app.modules.audits.service import run_audit
+
+    deliv = db.get(Deliverable, deliverable_id)
+    if not deliv or deliv.campaign_id != campaign_id:
+        raise ValueError("Várt promóciós anyag nem található")
+
+    asset = save_and_ingest(db, campaign_id, filename, data)
+    asset.channel_id = deliv.channel_id
+    asset.deliverable_id = deliv.id
+    deliv.asset_id = asset.id
+    db.commit()
+
+    run = run_audit(db, campaign_id, asset.id, user_id=user_id)
+    return asset, run
+
+
+def unlink_deliverable_asset(db: Session, campaign_id: int, deliverable_id: int) -> None:
+    deliv = db.get(Deliverable, deliverable_id)
+    if not deliv or deliv.campaign_id != campaign_id:
+        raise ValueError("Várt promóciós anyag nem található")
+
+    if deliv.asset_id:
+        asset = db.get(Asset, deliv.asset_id)
+        if asset:
+            asset.deliverable_id = None
+        deliv.asset_id = None
+        db.commit()
+
